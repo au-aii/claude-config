@@ -10,36 +10,37 @@
 ## プロジェクト開始方法
 
 このリポジトリ自体をそのまま開発には使いません。
-テンプレートとしてクローンし、必要ファイルを新規プロジェクトへコピーして利用します。
+テンプレートとしてクローンし、新規プロジェクトとして初期化して利用します。
+
+初回セットアップは **Dev Container を起動するだけでOK** です。
+`.devcontainer/devcontainer.json` の `postCreateCommand` により、
+`./.devcontainer/bootstrap.sh` が自動実行されます。
 
 1. テンプレートをクローンする
 
 ```bash
-git clone <this-repo-url> mcp-config-template
-cd mcp-config-template
+git clone <this-repo-url> my-project
+cd my-project
 ```
 
-2. 新規プロジェクトディレクトリを作成する
+2. テンプレートの Git 履歴を切り離して新規プロジェクトとして初期化する
 
 ```bash
-mkdir ../my-project
-```
+# macOS / Linux
+rm -rf .git
 
-3. 必要ファイルをコピーする（`.git` はコピーしない）
+# Windows (PowerShell)
+# Remove-Item -Recurse -Force .git
 
-```bash
-rsync -av --exclude '.git' ./ ../my-project/
-```
-
-4. 新規プロジェクトへ移動して初期化する
-
-```bash
-cd ../my-project
 git init
-npm install
+# VS Code で「Reopen in Container」を実行
+# 初回は bootstrap が自動実行される
 ```
 
-5. 最初はメモを優先し、内容が固まってからプロジェクト固有設定を更新する
+補足（必要な場合のみ）:
+- 自動実行後に再セットアップしたい場合は `./.devcontainer/bootstrap.sh` を手動実行してください。
+
+3. 最初はメモを優先し、内容が固まってからプロジェクト固有設定を更新する
 
 最初の段階では要件が未確定なことが多いため、この時点では深追いしません。
 `docs/ideas/` へのメモや要求整理を進め、プロジェクトの方向性が固まってきたタイミングで次を編集してください。
@@ -51,12 +52,14 @@ npm install
 
 ## 前提条件
 
-- Node.js と npx が利用可能であること
-- 初期セットアップで `npx playwright install chromium` を実行できること
+- Git が利用可能であること
+- Dev Container を利用できること（Docker / Dev Containers 拡張）
+- `.devcontainer/bootstrap.sh` が実行できること（Dev Container 起動時に自動実行）
 - 必要な環境変数を OS またはシェル側で設定できること
 
 補足:
 - `mcp_config.json` の `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` が未設定の場合、Context7 は利用できません。
+- `PLAYWRIGHT_SKIP_INSTALL=1 ./.devcontainer/bootstrap.sh` で Playwright の初期化のみスキップできます。
 
 ## CLAUDE.md の位置づけ
 

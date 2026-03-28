@@ -8,5 +8,5 @@
     },
     "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
   },
-  "postCreateCommand": "if [ -f package.json ]; then npm install; fi"
+  "postCreateCommand": "./.devcontainer/bootstrap.sh"
 }
