@@ -68,17 +68,19 @@ cd my-project
 rm -rf .git && git init
 
 # Dev Container を起動（VS Code で「Reopen in Container」）
-# bootstrap.sh が自動実行され MCP・Husky 等がセットアップされる
+# bootstrap.sh が自動実行され MCP 関連がセットアップされる
 ```
 
-### プロジェクト固有の設定を更新
+### プロジェクト固有の設定
 
-要件が固まってきたタイミングで以下を編集する：
+このテンプレートは **言語非依存** にしてある。プロジェクトを始めるタイミングで、必要に応じて以下を追加する：
 
-- `package.json` — プロジェクト名・依存関係
-- `.devcontainer/devcontainer.json` — 開発環境
-- `.mcp.json` — 使用する MCP サーバーと環境変数
-- `LICENSE.txt` — ライセンス
+- 言語ランタイム — `.devcontainer/devcontainer.json` の `features` に Node / Python / Rust 等を追加
+- パッケージ管理 — `package.json` / `pyproject.toml` / `Cargo.toml` などをプロジェクトに合わせて作成
+- リンター / フォーマッター — ESLint, Prettier, Ruff, rustfmt など必要なものだけ
+- Git hooks — Husky, pre-commit, lefthook など好みで
+- `.mcp.json` — 不要な MCP サーバーを削除、必要なものを追加
+- `LICENSE.txt` — プロジェクトのライセンス
 
 ---
 
@@ -93,7 +95,7 @@ rm -rf .git && git init
          ↓
 4. tasklist.md に従って実装
          ↓
-5. lint・型チェック・テストを実行
+5. プロジェクトで設定したチェックを実行
 ```
 
 ### スラッシュコマンド一覧
