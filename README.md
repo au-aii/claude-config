@@ -1,111 +1,131 @@
-# mcp-config テンプレート
+# claude-config
 
-このリポジトリは、プロジェクト立ち上げ時の設定と運用ルールを再利用するためのテンプレートです。
+Claude Code を使ったプロジェクト開発のためのテンプレートリポジトリ。
 
-## 実行コマンド参照
+新規プロジェクトにクローンして使う。エージェント・スキル・スラッシュコマンド・ドキュメント構造が最初から揃った状態で開発を始められる。
 
-実際に入力するコマンドプロンプトは [prompt.md](prompt.md) を参照してください。
-詳細ルールは [CLAUDE.md](CLAUDE.md) と [README.md](README.md) を正本とします。
+---
 
-## プロジェクト開始方法
+## 設計思想
 
-このリポジトリ自体をそのまま開発には使いません。
-テンプレートとしてクローンし、新規プロジェクトとして初期化して利用します。
+### ドキュメントを2層に分ける
 
-初回セットアップは **Dev Container を起動するだけでOK** です。
-`.devcontainer/devcontainer.json` の `postCreateCommand` により、
-`./.devcontainer/bootstrap.sh` が自動実行されます。
+| 層 | 場所 | 性質 |
+|---|---|---|
+| 永続ドキュメント | `docs/` | 「何を作るか・どう作るか」を定義。基本設計が変わるまで更新しない |
+| 作業ドキュメント | `.steering/YYYYMMDD-title/` | 「今回何をするか」を定義。作業ごとに新規作成、完了後は履歴として保持 |
 
-1. テンプレートをクローンする
+### AI エージェントを役割別に分ける
+
+プロジェクトの局面に応じて専門エージェントを呼び分ける。
+
+- **Designer Agent** — UI/UX 設計・ワイヤフレーム
+- **Dev Agent** — 実装・コードレビュー
+- **Doc Agent** — ドキュメント生成・整備
+- **Doc Reviewer** — ドキュメント品質チェック
+- **Implementation Validator** — 実装の妥当性検証
+- **Reviewer Agent** — コードレビュー・フィードバック
+
+### スキルで知識を構造化する
+
+繰り返し使う設計知識をスキルファイルに分離し、CLAUDE.md を肥大化させない。
+
+- `architecture-design` — 技術仕様・スタック選定
+- `development-guidelines` — コーディング規約・Git 規約
+- `functional-design` — 機能設計・データモデル
+- `glossary-creation` — ユビキタス言語定義
+- `prd-writing` — プロダクト要求定義
+- `repository-structure` — ディレクトリ設計
+- `steering` — 作業単位ドキュメントの管理
+
+---
+
+## 構成
+
+```
+claude-config/
+  .claude/
+    agents/          # 役割別エージェント定義
+    commands/        # スラッシュコマンド（/add-feature 等）
+    skills/          # 再利用可能な設計知識
+  .devcontainer/     # Dev Container 設定
+  .steering/         # 作業単位ドキュメント置き場（初期は空）
+  docs/
+    ideas/           # ブレスト・壁打ちメモ
+  CLAUDE.md          # プロジェクト運用ルール
+  mcp_config.json    # MCP サーバー設定（Context7 / Playwright / Chrome DevTools）
+  prompt.md          # よく使うコマンドのカタログ
+```
+
+---
+
+## セットアップ
 
 ```bash
-git clone <this-repo-url> my-project
+# クローンして新規プロジェクトとして初期化
+git clone https://github.com/au-aii/claude-config my-project
 cd my-project
+rm -rf .git && git init
+
+# Dev Container を起動（VS Code で「Reopen in Container」）
+# bootstrap.sh が自動実行され MCP・Husky 等がセットアップされる
 ```
 
-2. テンプレートの Git 履歴を切り離して新規プロジェクトとして初期化する
+### プロジェクト固有の設定を更新
 
-```bash
-# macOS / Linux
-rm -rf .git
+要件が固まってきたタイミングで以下を編集する：
 
-# Windows (PowerShell)
-# Remove-Item -Recurse -Force .git
+- `package.json` — プロジェクト名・依存関係
+- `.devcontainer/devcontainer.json` — 開発環境
+- `mcp_config.json` — 使用する MCP サーバーと環境変数
+- `LICENSE.txt` — ライセンス
 
-git init
-# VS Code で「Reopen in Container」を実行
-# 初回は bootstrap が自動実行される
+---
+
+## 開発フロー
+
+```
+1. アイデアを docs/ideas/ に記録
+         ↓
+2. docs/ の永続ドキュメントを整備（/setup-prd など）
+         ↓
+3. .steering/YYYYMMDD-title/ に作業ドキュメントを作成
+         ↓
+4. tasklist.md に従って実装
+         ↓
+5. lint・型チェック・テストを実行
 ```
 
-補足（必要な場合のみ）:
-- 自動実行後に再セットアップしたい場合は `./.devcontainer/bootstrap.sh` を手動実行してください。
+### スラッシュコマンド一覧
 
-3. 最初はメモを優先し、内容が固まってからプロジェクト固有設定を更新する
+| コマンド | 用途 |
+|---|---|
+| `/add-feature` | MVP 機能を実装する |
+| `/review-docs` | docs/ の品質レビュー |
+| `/setup-project` | 作業単位ドキュメントを一括作成 |
+| `/setup-prd` | PRD を作成 |
+| `/setup-functional-design` | 機能設計書を作成 |
+| `/setup-architecture` | 技術仕様書を作成 |
+| `/setup-repository-structure` | リポジトリ構造定義書を作成 |
+| `/setup-development-guidelines` | 開発ガイドラインを作成 |
+| `/setup-glossary` | ユビキタス言語定義を作成 |
 
-最初の段階では要件が未確定なことが多いため、この時点では深追いしません。
-`docs/ideas/` へのメモや要求整理を進め、プロジェクトの方向性が固まってきたタイミングで次を編集してください。
+---
 
-- `package.json`
-- `.devcontainer/devcontainer.json`
-- `mcp_config.json` の環境変数参照（特に Context7 用の値）
-- ライセンス表記と README
+## MCP 構成
+
+| サーバー | 用途 |
+|---|---|
+| `context7` | ライブラリの最新ドキュメントを参照（Upstash Redis 必要）|
+| `playwright` | ブラウザ操作・E2E テスト支援 |
+| `chrome-devtools` | Chrome DevTools プロトコル連携 |
+
+`mcp_config.json` の `REPLACE_ME_OR_SET_ENV` を環境変数または直値に置き換えて使う。
+
+---
 
 ## 前提条件
 
-- Git が利用可能であること
-- Dev Container を利用できること（Docker / Dev Containers 拡張）
-- `.devcontainer/bootstrap.sh` が実行できること（Dev Container 起動時に自動実行）
-- 必要な環境変数を OS またはシェル側で設定できること
-
-補足:
-- `mcp_config.json` の `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` が未設定の場合、Context7 は利用できません。
-- `PLAYWRIGHT_SKIP_INSTALL=1 ./.devcontainer/bootstrap.sh` で Playwright の初期化のみスキップできます。
-
-## CLAUDE.md の位置づけ
-
-`CLAUDE.md` は、このテンプレートの運用ポリシーを定義する基準ドキュメントです。
-
-- 目的: ドキュメント構造、作業手順、更新ルールを統一する
-- 対象: 開発者と AI エージェントの両方
-- 性質: プロジェクト全体に適用する「ルールブック」
-
-特に、次の原則を README からも参照できるようにします。
-
-- 永続的ドキュメントは `docs/` 配下で管理する
-- 作業単位のドキュメントは `.steering/[YYYYMMDD]-[title]/` で管理する
-- 設計方針が変わる場合のみ永続ドキュメントを更新する
-
-## ドキュメント運用モデル
-
-- 永続的ドキュメント: `docs/` 配下に配置し、プロジェクトの基本設計を保持する
-- 作業単位ドキュメント: `.steering/` 配下に作業ごとに作成し、変更の意図と履歴を管理する
-- アイデアメモ: `docs/ideas/` に自由形式で記録する
-
-## 標準フロー
-
-1. アイデアを `docs/ideas/` に記録する
-2. `docs/` の永続ドキュメントを整備する
-3. `.steering/` に作業単位ディレクトリを作成する
-4. 要求・設計・タスクを明確化して実装する
-5. 実装後に lint、型チェック、テストを実行する
-
-## テンプレート適用時のカスタマイズ
-
-- `package.json`
-- `.devcontainer/devcontainer.json`
-- `.husky/` 配下のフック設定（例: `.husky/pre-commit`）
-- フォーマッター設定（`.prettierignore`, `.prettierrc`, `eslint.config.js`）
-- `LICENSE.txt` はプロジェクトのライセンスポリシーに合わせて適切なものを選択してください。
-
-## Husky 運用メモ
-
-Husky を有効にするには、設定ファイルを置くだけでなく初期化が必要です。
-
-- Git リポジトリとして初期化されていること
-- Husky が依存関係としてインストールされていること
-- フック有効化の初期化処理が完了していること
-
-推奨:
-- フック内容はチームで合意する
-- 重い処理は CI に寄せる
-- セットアップ手順を README に明記する
+- Git
+- Docker（Dev Container 用）
+- VS Code + Dev Containers 拡張
