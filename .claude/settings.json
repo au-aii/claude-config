@@ -8,8 +8,47 @@
       "Skill(development-guidelines)",
       "Skill(glossary-creation)"
     ],
-    "deny": [],
-    "ask": []
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./.aws/**)",
+      "Read(./.ssh/**)"
+    ],
+    "defaultMode": "auto"
   },
-  "hooks": {}
+  "model": "sonnet",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json,sys,subprocess,os; d=json.load(sys.stdin); fp=(d.get('tool_input') or {}).get('file_path',''); ext=os.path.splitext(fp)[1]; subprocess.run(['npx','prettier','--write',fp],capture_output=True) if fp and ext in {'.js','.ts','.jsx','.tsx','.json','.css','.scss','.md'} else None\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude が停止しました\" with title \"Claude Code\"' 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  },
+  "language": "japanese",
+  "effortLevel": "medium",
+  "skipWorkflowUsageWarning": true,
+  "skipAutoPermissionPrompt": true,
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
 }
