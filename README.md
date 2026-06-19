@@ -45,8 +45,8 @@ done
 
 1. `docs/ideas/` にアイデアをメモ
 2. `/setup-*` で `docs/` の永続ドキュメントを整備
-3. `.steering/YYYYMMDD-title/` に作業ドキュメントを作成
-4. `tasklist.md` に従って実装
+3. `/add-feature <Issue番号> <機能名>` でブランチ・ステアリング生成〜実装まで自動実行
+4. `/ship` でPR作成〜自動レビュー〜修正〜マージまで一気通貫で実行
 
 ## MCP
 
