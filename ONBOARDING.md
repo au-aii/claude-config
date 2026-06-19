@@ -79,7 +79,58 @@ gh repo create <プロジェクト名> --private --source=. --push
 
 ---
 
-## Step 3.6 — コマンドをグローバルに共有する（オプション）
+## Step 3.6 — Windows 通知を有効にする（WSL2 + Windows のみ）
+
+処理完了時・入力待ち時に Windows トースト通知を受け取れるようにする。
+
+```bash
+# スクリプトをコピーして実行権限を付与
+mkdir -p ~/.claude/scripts
+cp scripts/stop.sh scripts/notification.sh ~/.claude/scripts/
+chmod +x ~/.claude/scripts/stop.sh ~/.claude/scripts/notification.sh
+```
+
+次に `~/.claude/settings.json` の `hooks` に以下を追加する（既存の設定とマージすること）：
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [{ "type": "command", "command": "~/.claude/scripts/stop.sh" }]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "~/.claude/scripts/notification.sh" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+設定後は Claude Code を再起動するか `/hooks` を開くと有効になる。
+
+---
+
+## Step 3.7 — マウス操作を有効にする（オプション）
+
+ターミナル上でクリックによるカーソル移動・マウスホイールスクロールが使えるようになる（v2.1.88 以降）。
+
+```bash
+echo 'export CLAUDE_CODE_NO_FLICKER=1' >> ~/.bashrc
+source ~/.bashrc
+```
+
+zsh を使っている場合は `~/.bashrc` を `~/.zshrc` に置き換える。
+
+---
+
+## Step 3.8 — コマンドをグローバルに共有する（オプション）
 
 他のプロジェクトでもこのリポジトリのコマンドを使えるようにするには、`~/.claude/commands/` にシンボリックリンクを作成する：
 
