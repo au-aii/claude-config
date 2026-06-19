@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# git pull --rebase 後に自動実行
+# $1 は "rebase" または "amend" — pull の rebase のみ対象にする
+[[ "${1:-}" == "rebase" ]] || exit 0
+exec "$(git rev-parse --show-toplevel)/scripts/sync.sh"
