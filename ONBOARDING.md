@@ -59,6 +59,41 @@ claude
 
 ---
 
+## Step 3.5 — GitHub CLI にログインする
+
+`/add-feature` や `/ship` で `gh` コマンドを使うため、認証が必要：
+
+```bash
+gh auth login
+```
+
+ブラウザが開くので GitHub アカウントで認証する。
+
+次に、このプロジェクトの GitHub リポジトリを作成してリモートを設定する：
+
+```bash
+gh repo create <プロジェクト名> --private --source=. --push
+```
+
+> すでにリモートがある場合はスキップ。
+
+---
+
+## Step 3.6 — コマンドをグローバルに共有する（オプション）
+
+他のプロジェクトでもこのリポジトリのコマンドを使えるようにするには、`~/.claude/commands/` にシンボリックリンクを作成する：
+
+```bash
+mkdir -p ~/.claude/commands
+for f in "$(pwd)/.claude/commands/"*.md; do
+  ln -sf "$f" ~/.claude/commands/
+done
+```
+
+以降は このリポジトリ側を更新するだけで全プロジェクトに自動反映される。
+
+---
+
 ## Step 4 — プロジェクトの設計を固める（初回のみ）
 
 Claude Code のチャットで以下を実行する。**1ファイルごとに確認しながら進める**：
