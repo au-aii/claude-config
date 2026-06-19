@@ -9,7 +9,8 @@
 
 ## Frequently Used
 
-- `/add-feature` MVP機能を実装する
+- `/add-feature` Issue からブランチ・ステアリング生成→実装まで自動実行する
+- `/ship` PR作成→自動レビュー→修正ループ→マージまで一気通貫で実行する
 - `/setup-steering` 作業用の requirements / design / tasklist を作成する
 - `/review-docs` docs配下の品質レビューを行う
 
