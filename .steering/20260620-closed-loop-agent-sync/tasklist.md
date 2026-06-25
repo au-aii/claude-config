@@ -1,77 +1,27 @@
-# タスクリスト
+# タスクリスト（訂正版）
 
-## 🚨 タスク完全完了の原則
+> 当初の計画（claude-config を正本にする）は誤りだったため全面書き直し。
+> 正本は claude-dotfiles。
 
-**このファイルの全タスクが完了するまで作業を継続すること**
+## Phase 1: claude-config から誤配置ファイルを削除（feat/closed-loop-agents）
 
-### 必須ルール
+- [x] `.claude/agents/executor.md` を git rm
+- [x] `.claude/agents/sceptic.md` を git rm
+- [x] `.claude/agents/evaluator.md` を git rm
+- [x] `.claude/commands/closed-loop.md` を git rm
+- [x] `scripts/sync.sh` に重複チェック（`check_duplicates`）を追加
+- [x] .steering ドキュメントを訂正（requirements / design / tasklist）
+- [ ] コミット・PR 作成 → main マージ
 
-- **全てのタスクを`[x]`にすること**
-- 「時間の都合により別タスクとして実施予定」は禁止
-- 未完了タスク（`[ ]`）を残したまま作業を終了しない
+## Phase 2: ~/.claude/ のシンボリックリンクを dotfiles に切り替え
 
----
+- [ ] `bash ~/Developer/claude-dotfiles/install.sh` を実行
+- [ ] `ls -la ~/.claude/agents/ | grep -E "executor|sceptic|evaluator"` で dotfiles を指すことを確認
+- [ ] `ls -la ~/.claude/commands/ | grep closed-loop` で dotfiles を指すことを確認
 
-## フェーズ1: claude-dotfiles の重複除去
+## Phase 3（将来・別 PR）: research- プレフィックスへのリネーム
 
-- [ ] `chore/remove-obsidian-agents-duplicate` ブランチへ移動
-  - [ ] `git -C ~/Developer/claude-dotfiles checkout chore/remove-obsidian-agents-duplicate`
-- [ ] 重複4ファイルを削除
-  - [ ] `git -C ~/Developer/claude-dotfiles rm agents/executor.md`
-  - [ ] `git -C ~/Developer/claude-dotfiles rm agents/sceptic.md`
-  - [ ] `git -C ~/Developer/claude-dotfiles rm agents/evaluator.md`
-  - [ ] `git -C ~/Developer/claude-dotfiles rm commands/closed-loop.md`
-- [ ] コミット・プッシュ
-  - [ ] `git commit -m "chore(agents): closed-loopエージェントをclaude-configへ移管"`
-  - [ ] `git push`
-
-## フェーズ2: claude-config の main マージ
-
-- [ ] `feat/closed-loop-agents` ブランチの PR を作成
-  - [ ] `gh pr create -R au-aii/claude-config --base main --head feat/closed-loop-agents`
-- [ ] PR をマージ
-  - [ ] `gh pr merge --squash` または GitHub UI でマージ
-- [ ] main ブランチを最新化
-  - [ ] `git -C ~/Developer/claude-config checkout main && git pull`
-
-## フェーズ3: ~/.claude/ への同期
-
-- [ ] sync.sh を手動実行
-  - [ ] `bash ~/Developer/claude-config/scripts/sync.sh`
-- [ ] シンボリックリンクを確認
-  - [ ] `ls -la ~/.claude/agents/ | grep -E "executor|sceptic|evaluator"`
-  - [ ] `ls -la ~/.claude/commands/ | grep closed-loop`
-  - [ ] 全て `claude-config` を指していることを確認
-
-## フェーズ4: 動作確認
-
-- [ ] Claude Code セッションを再起動（または新しいセッションを開く）
-- [ ] システムリマインダーに executor / sceptic / evaluator が表示されることを確認
-- [ ] `/closed-loop` スキルが認識されることを確認
-- [ ] テスト実行
-  - [ ] `/closed-loop フィボナッチ数列の最適なPython実装を3手法で比較し、n=30のベンチマーク結果を示せ`
-  - [ ] Executor が JSON でコードを返すことを確認
-  - [ ] Bash サンドボックスでコードが実行されることを確認
-  - [ ] Sceptic・Evaluator が動作することを確認
-
----
-
-## 実装後の振り返り
-
-### 実装完了日
-
-{YYYY-MM-DD}
-
-### 計画と実績の差分
-
-## **計画と異なった点**:
-
-## **新たに必要になったタスク**:
-
-### 学んだこと
-
--
-
-### 次回への改善提案
-
--
+- [ ] `claude-dotfiles/agents/executor.md` → `research-executor.md`（frontmatter name も変更）
+- [ ] `claude-dotfiles/agents/sceptic.md` → `research-sceptic.md`
+- [ ] `claude-dotfiles/agents/evaluator.md` → `research-evaluator.md`
+- [ ] `claude-dotfiles/commands/closed-loop.md` 内のエージェント名参照を更新

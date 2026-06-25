@@ -1,86 +1,56 @@
-# 要求内容
+# 要求内容（訂正版）
 
 ## 概要
 
-closed-loop エージェントチーム（executor / sceptic / evaluator + closed-loop スキル）を
-`claude-config` を唯一の正本として `~/.claude/` へ正しく同期し、
-Claude Code のどのセッションからでも `/closed-loop` が使える状態にする。
+closed-loop エージェントチーム（executor / sceptic / evaluator + closed-loop コマンド）の
+正本を `claude-dotfiles`（個人・private）に置き、`claude-config`（チーム・public）から削除する。
 
-## 背景
+## 背景と訂正の経緯
 
-今回の実装セッションで以下の問題が生じた：
+当初の要件定義（初版）は以下の誤った判断を行った：
 
-1. **APIキー問題**: 最初に Python + Anthropic SDK で実装 → `ANTHROPIC_API_KEY` が必要になった
-2. **再実装**: Claude Code のエージェントチーム形式（`.md` ファイル）に作り直した
-3. **重複**: `claude-dotfiles/agents/` と `claude-config/.claude/agents/` の両方に入った
-4. **未同期**: `~/.claude/agents/` に executor / sceptic / evaluator / closed-loop が存在しない
-   → 現状、`/closed-loop` は動かない
+> 正本は `claude-config`（公開リポジトリ）にする
 
-正本は `claude-config`（公開リポジトリ）であり、
-`claude-dotfiles`（非公開）の重複は除去すべき。
+これはワークスペースルール（`~/Developer/CLAUDE.md`）に違反していた：
 
-## 実装対象の機能
+| リポジトリ        | 置くべきもの                           |
+| ----------------- | -------------------------------------- |
+| `claude-dotfiles` | **研究エージェント**・個人コマンド     |
+| `claude-config`   | チーム共有の開発エージェント・コマンド |
 
-### 1. 重複ファイルの除去（claude-dotfiles）
+executor / sceptic / evaluator / closed-loop は**研究用ツール**であり、
+`claude-dotfiles` が正本。`claude-config` への配置は誤りだった。
 
-`claude-dotfiles` に誤って追加した以下のファイルを削除する：
+## 実装対象
 
-- `agents/executor.md`
-- `agents/sceptic.md`
-- `agents/evaluator.md`
-- `commands/closed-loop.md`
-
-### 2. claude-config の `feat/closed-loop-agents` ブランチを main にマージ
-
-4ファイルを正式に main ブランチに取り込む：
+### 1. claude-config から4ファイルを削除
 
 - `.claude/agents/executor.md`
 - `.claude/agents/sceptic.md`
 - `.claude/agents/evaluator.md`
 - `.claude/commands/closed-loop.md`
 
-### 3. sync.sh を実行して ~/.claude/ を更新
+### 2. sync.sh に重複チェックを追加
 
-`scripts/sync.sh` を手動実行し、上記4ファイルを `~/.claude/agents/` / `~/.claude/commands/` にシンボリックリンクする。
+claude-config と claude-dotfiles の両方に同名ファイルが存在する場合、
+sync.sh がエラーで停止するガードを追加する。
 
-### 4. 動作確認
+### 3. dotfiles を正本として ~/.claude/ のリンクを修正
 
-Claude Code セッションで `/closed-loop` が起動し、3エージェントがループを回せることを確認する。
+dotfiles には既に4ファイルが存在する。
+`bash ~/Developer/claude-dotfiles/install.sh` を再実行してリンクを更新。
 
 ## 受け入れ条件
 
-### 重複除去
+- [ ] `claude-config/.claude/agents/` に executor / sceptic / evaluator が存在しない
+- [ ] `claude-config/.claude/commands/` に closed-loop が存在しない
+- [ ] `~/.claude/agents/executor.md` が `claude-dotfiles` を指すシンボリックリンク
+- [ ] `~/.claude/agents/sceptic.md` が `claude-dotfiles` を指すシンボリックリンク
+- [ ] `~/.claude/agents/evaluator.md` が `claude-dotfiles` を指すシンボリックリンク
+- [ ] `~/.claude/commands/closed-loop.md` が `claude-dotfiles` を指すシンボリックリンク
+- [ ] `bash scripts/sync.sh` が重複ファイルなしで正常終了する
 
-- [ ] `claude-dotfiles/agents/` に executor / sceptic / evaluator が存在しない
-- [ ] `claude-dotfiles/commands/` に closed-loop が存在しない
-- [ ] claude-dotfiles のブランチへコミット・プッシュ済み
+## スコープ外（Phase 2）
 
-### 同期
-
-- [ ] `~/.claude/agents/executor.md` が `claude-config` を指すシンボリックリンクである
-- [ ] `~/.claude/agents/sceptic.md` が `claude-config` を指すシンボリックリンクである
-- [ ] `~/.claude/agents/evaluator.md` が `claude-config` を指すシンボリックリンクである
-- [ ] `~/.claude/commands/closed-loop.md` が `claude-config` を指すシンボリックリンクである
-
-### 動作確認
-
-- [ ] Claude Code のシステムリマインダーに executor / sceptic / evaluator がエージェントとして表示される
-- [ ] `/closed-loop` スキルが認識される
-
-## 成功指標
-
-- `ls -la ~/.claude/agents/ | grep executor` で claude-config へのリンクが確認できる
-- `/closed-loop` を呼び出すと executor エージェントが起動する
-
-## スコープ外
-
-- Obsidian vault の未コミット変更（別タスク）
-- closed-loop エージェント自体の品質改善・バグ修正
-- claude-dotfiles の他のファイル整理
-
-## 参照
-
-- `claude-config/.claude/agents/executor.md` / `sceptic.md` / `evaluator.md`
-- `claude-config/.claude/commands/closed-loop.md`
-- `claude-config/scripts/sync.sh`
-- `claude-dotfiles/install.sh`
+- `research-` プレフィックスへのリネーム（副作用が大きいため分離）
+- dotfiles の他ファイル整理
