@@ -79,7 +79,52 @@ gh repo create <プロジェクト名> --private --source=. --push
 
 ---
 
-## Step 3.6 — Windows 通知を有効にする（WSL2 + Windows のみ）
+## Step 3.6 — 通知を設定する
+
+### Mac（デフォルトで有効）
+
+このテンプレートの `.claude/settings.json` には Mac 通知がすでに組み込まれている。
+Claude 停止時に macOS 標準通知（`osascript`）が自動で表示される。**追加設定は不要**。
+
+通知をカスタマイズしたい場合は `~/.claude/settings.json`（グローバル設定）の `Stop` フックを編集する：
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude が停止しました\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+入力待ち（`Notification` イベント）にも通知を出したい場合：
+
+```json
+{
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"入力を待っています\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Windows（WSL2 + Windows のみ）
 
 処理完了時・入力待ち時に Windows トースト通知を受け取れるようにする。
 
@@ -117,31 +162,41 @@ chmod +x ~/.claude/scripts/stop.sh ~/.claude/scripts/notification.sh
 
 ---
 
-## Step 3.7 — マウス操作を有効にする（オプション）
+## Step 3.7 — マウスクリックを有効にする（オプション）
 
 ターミナル上でクリックによるカーソル移動・マウスホイールスクロールが使えるようになる（v2.1.88 以降）。
+
+**Mac（zsh）:**
+
+```bash
+echo 'export CLAUDE_CODE_NO_FLICKER=1' >> ~/.zshrc
+source ~/.zshrc
+```
+
+**Mac（bash）/ Linux / WSL2:**
 
 ```bash
 echo 'export CLAUDE_CODE_NO_FLICKER=1' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-zsh を使っている場合は `~/.bashrc` を `~/.zshrc` に置き換える。
+設定後は新しいターミナルセッションで Claude Code を起動すると有効になる。
 
 ---
 
-## Step 3.8 — コマンドをグローバルに共有する（オプション）
+## Step 3.8 — コマンド・エージェントをグローバルに共有する（推奨）
 
-他のプロジェクトでもこのリポジトリのコマンドを使えるようにするには、`~/.claude/commands/` にシンボリックリンクを作成する：
+`git pull` のたびに commands / agents を `~/.claude/` へ自動同期する仕組みを有効にする。**初回1回だけ**実行する：
 
 ```bash
-mkdir -p ~/.claude/commands
-for f in "$(pwd)/.claude/commands/"*.md; do
-  ln -sf "$f" ~/.claude/commands/
-done
+# git hooks パスをこのリポジトリの .githooks/ に向ける
+git config core.hooksPath .githooks
+
+# 現在の内容を即時反映
+bash scripts/sync.sh
 ```
 
-以降は このリポジトリ側を更新するだけで全プロジェクトに自動反映される。
+これ以降は `git pull` するだけで `~/.claude/commands/` と `~/.claude/agents/` が自動更新される（merge / rebase どちらの pull にも対応）。
 
 ---
 
