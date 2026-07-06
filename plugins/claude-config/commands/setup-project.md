@@ -1,5 +1,5 @@
 ---
-description: 初回セットアップ: 6つの永続ドキュメントを対話的に作成する
+description: "初回セットアップ: 6つの永続ドキュメントを対話的に作成する"
 ---
 
 # 初回プロジェクトセットアップ
@@ -16,6 +16,7 @@ claude
 ## 実行前の確認
 
 `docs/ideas/` ディレクトリ内のファイルを確認します。
+
 ```bash
 # 確認
 ls docs/ideas/
@@ -53,7 +54,7 @@ ls docs/ideas/
 
 1. **functional-designスキル**をロード
 1. `docs/product-requirements.md`を読む
-3. スキルのテンプレートとガイドに従って`docs/functional-design.md`を作成
+1. スキルのテンプレートとガイドに従って`docs/functional-design.md`を作成
 
 ### ステップ3: アーキテクチャ設計書の作成
 
@@ -84,6 +85,7 @@ ls docs/ideas/
 - 6つの永続ドキュメントが全て作成されていること
 
 完了時のメッセージ:
+
 ```
 「初回セットアップが完了しました!
 
