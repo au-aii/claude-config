@@ -26,6 +26,17 @@ cd my-project && rm -rf .git && git init
 
 VS Code で「Reopen in Container」すると `bootstrap.sh` が走り MCP 関連がセットアップされる。
 
+### Plugin として導入する（試験運用）
+
+Claude Code の公式 Plugin 機構でも導入できる（GitHubへのpush不要、ローカルパスから即時導入可能）:
+
+```bash
+/plugin marketplace add /path/to/claude-config/plugins
+/plugin install claude-config@claude-config-marketplace
+```
+
+詳細手順は [`docs/plugin-getting-started.md`](docs/plugin-getting-started.md)、採用理由は [ADR-0001](docs/adr/0001-plugin-based-distribution.md) を参照。既存の clone-and-detach / symlink 方式と並行運用中。
+
 ### スキルをグローバルに共有する（オプション）
 
 `.claude/commands/` のスキルをすべてのプロジェクトで使えるようにするには、`~/.claude/commands/` にシンボリックリンクを作成する。
