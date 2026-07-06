@@ -11,6 +11,31 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLAUDE_DIR="$REPO_ROOT/.claude"
 TARGET_ROOT="$HOME/.claude"
 
+# 研究系ツール（個人用）は claude-dotfiles に置くべき。
+# claude-config（チーム共有）と dotfiles の両方に同名ファイルがあると誤配置の兆候。
+check_duplicates() {
+  local subdir="$1"
+  local src_dir="$CLAUDE_DIR/$subdir"
+  local dotfiles_dir="$HOME/Developer/claude-dotfiles/$subdir"
+  [[ -d "$src_dir" && -d "$dotfiles_dir" ]] || return 0
+  local found=0
+  for src in "$src_dir"/*.md; do
+    [[ -e "$src" ]] || continue
+    local name
+    name="$(basename "$src")"
+    if [[ -f "$dotfiles_dir/$name" ]]; then
+      echo "❌ 重複検出: $name が claude-config と claude-dotfiles の両方に存在します" >&2
+      echo "   claude-config:   $src" >&2
+      echo "   claude-dotfiles: $dotfiles_dir/$name" >&2
+      found=1
+    fi
+  done
+  if [[ "$found" -eq 1 ]]; then
+    echo "→ 研究・個人用ツールは claude-dotfiles のみに置いてください。" >&2
+    exit 1
+  fi
+}
+
 sync_dir() {
   local src_dir="$CLAUDE_DIR/$1"
   local dst_dir="$TARGET_ROOT/$1"
@@ -49,6 +74,8 @@ sync_dir() {
 }
 
 echo "[claude-config] ~/.claude/ を同期中..."
+check_duplicates "agents"
+check_duplicates "commands"
 sync_dir "commands"
 sync_dir "agents"
 echo "[claude-config] 完了"
