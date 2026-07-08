@@ -5,7 +5,7 @@
 
 - 全体運用: [README.md](README.md)
 - ルール基準: [CLAUDE.md](CLAUDE.md)
-- スキル詳細: [.claude/skills](.claude/skills)
+- スキル詳細: [plugins/dev/skills](plugins/dev/skills)
 
 ## Frequently Used
 
@@ -25,10 +25,10 @@
 
 ## Skill Backlinks
 
-- [architecture-design](.claude/skills/architecture-design/SKILL.md)
-- [development-guidelines](.claude/skills/development-guidelines/SKILL.md)
-- [functional-design](.claude/skills/functional-design/SKILL.md)
-- [glossary-creation](.claude/skills/glossary-creation/SKILL.md)
-- [prd-writing](.claude/skills/prd-writing/SKILL.md)
-- [repository-structure](.claude/skills/repository-structure/SKILL.md)
-- [steering](.claude/skills/steering/SKILL.md)
+- [architecture-design](plugins/dev/skills/architecture-design/SKILL.md)
+- [development-guidelines](plugins/dev/skills/development-guidelines/SKILL.md)
+- [functional-design](plugins/dev/skills/functional-design/SKILL.md)
+- [glossary-creation](plugins/dev/skills/glossary-creation/SKILL.md)
+- [prd-writing](plugins/dev/skills/prd-writing/SKILL.md)
+- [repository-structure](plugins/dev/skills/repository-structure/SKILL.md)
+- [steering](plugins/dev/skills/steering/SKILL.md)

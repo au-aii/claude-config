@@ -1,7 +1,9 @@
 # ADR-0001: Plugin配布方式の導入（既存方式と併用）
 
-- Status: Accepted
+- Status: Accepted（2026-07-08 カットオーバー実施により過渡期は終了。下記追記参照）
 - Date: 2026-07-06
+
+> **カットオーバー追記（2026-07-08, Issue #19）**: 本 ADR が「Consequences」で先送りとした正式カットオーバーを実施した。claude-config は private 正本 `claude-dotfiles` からの**一方向生成物**へ転換し、二重管理していた `.claude/{agents,commands,skills}` と `plugins/claude-config/`、および旧同期機構（`scripts/sync.sh`・`.githooks/{post-merge,post-rewrite}`）を削除。plugin は正本から生成される `dev`（`plugins/dev/`）に一本化し、marketplace 定義はリポジトリルート `.claude-plugin/marketplace.json`（`source: ./plugins/dev`）へ移設した。以下本文中の「`.claude/` は当面無改変」「二重管理を許容」等は当時の過渡期の判断であり、現在は解消済み。
 
 ## Context
 

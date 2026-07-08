@@ -1,68 +1,53 @@
 # claude-config
 
-Claude Code を使ったプロジェクト開発のためのテンプレート。
+Claude Code の開発ワークフロー（SDD: PRD〜steering〜実装〜レビュー）を配布する **`dev` plugin** の公開マーケットプレイス。
 
-## 設計思想
+> **この repo は生成物です。** 正本は private リポジトリ `claude-dotfiles` の `plugins/` にあり、ここは publish パイプラインで **一方向に生成**された配布物です。直接編集しないでください（各ファイル先頭に自動生成ヘッダーがあります。編集は正本側で行い再生成します）。経緯は Issue #19 を参照。
 
-### ドキュメントを2層に分ける
+## 何が入っているか
+
+`dev` plugin（`plugins/dev/`）が提供するもの:
+
+- **エージェント** — Designer / Dev / Doc / Reviewer など局面別に呼び分け
+- **スキル** — 設計知識（アーキテクチャ設計・機能設計・PRD・用語集・リポジトリ構造・開発ガイドライン・steering）を分離して CLAUDE.md を肥大化させない
+- **コマンド** — `/asdd`・`/add-feature`・`/setup-project`・`/setup-steering`・`/ship`・`/smart-review`・`/review-docs`（一覧は [`prompt.md`](prompt.md)）
+
+## インストール
+
+Claude Code の Plugin 機構で導入する:
+
+```
+/plugin marketplace add au-aii/claude-config
+/plugin install dev@claude-config-marketplace
+```
+
+ローカルにクローン済みなら、リポジトリルートをパス指定しても追加できる:
+
+```
+/plugin marketplace add /path/to/claude-config
+/plugin install dev@claude-config-marketplace
+```
+
+詳細手順は [`docs/plugin-getting-started.md`](docs/plugin-getting-started.md)、採用理由は [ADR-0001](docs/adr/0001-plugin-based-distribution.md) を参照。プロジェクトのテンプレートとして丸ごと使う手順は [ONBOARDING.md](ONBOARDING.md)。
+
+## 開発フロー
+
+1. `docs/ideas/` にアイデアをメモ
+2. `/setup-project` で `docs/` の永続ドキュメントを整備
+3. `/add-feature <Issue番号> <機能名>` でブランチ・ステアリング生成〜実装まで自動実行
+4. `/ship` で PR 作成〜レビュー〜修正〜マージまで一気通貫で実行
+
+## 設計思想: ドキュメントを2層に分ける
 
 | 層       | 場所                        | 性質                                               |
 | -------- | --------------------------- | -------------------------------------------------- |
 | 永続     | `docs/`                     | プロジェクトの基本設計。方針が変わるまで更新しない |
 | 作業単位 | `.steering/YYYYMMDD-title/` | 今回の作業の要求・設計・タスク。作業ごとに新規作成 |
 
-### 役割で分ける
-
-- **エージェント** (`.claude/agents/`) — Designer / Dev / Doc / Reviewer など局面別に呼び分け
-- **スキル** (`.claude/skills/`) — 設計知識を分離して CLAUDE.md を肥大化させない
-- **コマンド** (`.claude/commands/`) — `/setup-prd` 等で頻出操作を呼び出す（一覧は [`prompt.md`](prompt.md)）
-
-## セットアップ
-
-```bash
-git clone https://github.com/au-aii/claude-config my-project
-cd my-project && rm -rf .git && git init
-```
-
-VS Code で「Reopen in Container」すると `bootstrap.sh` が走り MCP 関連がセットアップされる。
-
-### Plugin として導入する（試験運用）
-
-Claude Code の公式 Plugin 機構でも導入できる（GitHubへのpush不要、ローカルパスから即時導入可能）:
-
-```bash
-/plugin marketplace add /path/to/claude-config/plugins
-/plugin install claude-config@claude-config-marketplace
-```
-
-詳細手順は [`docs/plugin-getting-started.md`](docs/plugin-getting-started.md)、採用理由は [ADR-0001](docs/adr/0001-plugin-based-distribution.md) を参照。既存の clone-and-detach / symlink 方式と並行運用中。
-
-### スキルをグローバルに共有する（オプション）
-
-`.claude/commands/` のスキルをすべてのプロジェクトで使えるようにするには、`~/.claude/commands/` にシンボリックリンクを作成する。
-
-```bash
-mkdir -p ~/.claude/commands
-for f in /path/to/claude-config/.claude/commands/*.md; do
-  ln -sf "$f" ~/.claude/commands/
-done
-```
-
-以降は `claude-config` リポジトリ側を更新するだけで全プロジェクトに自動反映される。新しいスキルを追加した際は同じコマンドを再実行する。
-
-このテンプレートは **言語非依存**。使う言語のランタイム・パッケージ管理・リンターはクローン後にプロジェクトに合わせて追加する。
-
-## 開発フロー
-
-1. `docs/ideas/` にアイデアをメモ
-2. `/setup-*` で `docs/` の永続ドキュメントを整備
-3. `/add-feature <Issue番号> <機能名>` でブランチ・ステアリング生成〜実装まで自動実行
-4. `/ship` でPR作成〜自動レビュー〜修正〜マージまで一気通貫で実行
-
 ## MCP
 
 `.mcp.json` で `context7` / `playwright` / `chrome-devtools` を有効化している。
-`${VAR}` 構文を使っているので、起動前にシェルで環境変数を export しておく：
+`${VAR}` 構文を使っているので、起動前にシェルで環境変数を export しておく:
 
 ```bash
 export UPSTASH_REDIS_REST_URL="https://..."

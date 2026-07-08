@@ -7,9 +7,9 @@
   },
   "plugins": [
     {
-      "name": "claude-config",
-      "source": "./claude-config",
-      "description": "PRD〜steering〜実装〜レビューの開発ワークフロー一式"
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "開発ワークフロー（SDD）: designer/dev/doc系agents + asdd, setup-project, ship, smart-review 等のcommands + 設計ドキュメントskills"
     }
   ]
 }
