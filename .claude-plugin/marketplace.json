@@ -1,0 +1,15 @@
+{
+  "name": "claude-config-marketplace",
+  "description": "PRD〜steering〜実装〜レビューの開発ワークフロー一式を配布するマーケットプレイス",
+  "owner": {
+    "name": "au-aii",
+    "url": "https://github.com/au-aii/claude-config"
+  },
+  "plugins": [
+    {
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "開発ワークフロー（SDD）: designer/dev/doc系agents + asdd, setup-project, ship, smart-review 等のcommands + 設計ドキュメントskills"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "dev",
+  "description": "開発ワークフロー（SDD）: designer/dev/doc系agents + asdd, setup-project, ship, smart-review 等のcommands + 設計ドキュメントskills",
+  "version": "0.1.0",
+  "author": {
+    "name": "au-aii"
+  }
+}

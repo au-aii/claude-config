@@ -184,19 +184,23 @@ source ~/.bashrc
 
 ---
 
-## Step 3.8 — コマンド・エージェントをグローバルに共有する（推奨）
+## Step 3.8 — `dev` plugin を導入する（推奨）
 
-`git pull` のたびに commands / agents を `~/.claude/` へ自動同期する仕組みを有効にする。**初回1回だけ**実行する：
+エージェント・コマンド・スキルは `dev` plugin として配布している。Claude Code のチャットで導入する:
 
-```bash
-# git hooks パスをこのリポジトリの .githooks/ に向ける
-git config core.hooksPath .githooks
-
-# 現在の内容を即時反映
-bash scripts/sync.sh
+```
+/plugin marketplace add au-aii/claude-config
+/plugin install dev@claude-config-marketplace
 ```
 
-これ以降は `git pull` するだけで `~/.claude/commands/` と `~/.claude/agents/` が自動更新される（merge / rebase どちらの pull にも対応）。
+このリポジトリをクローン済みなら、リポジトリルートをパス指定しても導入できる:
+
+```
+/plugin marketplace add /path/to/claude-config
+/plugin install dev@claude-config-marketplace
+```
+
+以降 `/add-feature`・`/ship` などのコマンドが使えるようになる。
 
 ---
 
