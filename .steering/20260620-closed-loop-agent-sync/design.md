@@ -34,12 +34,12 @@ sync.sh がエラー終了して誤配置を検出する。
 ```
 ~/.claude/
 ├── agents/
-│   ├── executor.md    → /Users/sunsun/Developer/claude-dotfiles/agents/executor.md
-│   ├── sceptic.md     → /Users/sunsun/Developer/claude-dotfiles/agents/sceptic.md
-│   ├── evaluator.md   → /Users/sunsun/Developer/claude-dotfiles/agents/evaluator.md
+│   ├── executor.md    → ~/Developer/claude-dotfiles/agents/executor.md
+│   ├── sceptic.md     → ~/Developer/claude-dotfiles/agents/sceptic.md
+│   ├── evaluator.md   → ~/Developer/claude-dotfiles/agents/evaluator.md
 │   └── ...
 └── commands/
-    ├── closed-loop.md → /Users/sunsun/Developer/claude-dotfiles/commands/closed-loop.md
+    ├── closed-loop.md → ~/Developer/claude-dotfiles/commands/closed-loop.md
     └── ...
 
 claude-config/.claude/agents/   ← executor / sceptic / evaluator なし
