@@ -296,6 +296,10 @@ npx playwright install chromium
 ```
 .
 ├── .claude/
+│   └── settings.json     # 権限・hooks・モデル設定
+├── .claude-plugin/
+│   └── marketplace.json  # dev plugin のマーケットプレイス定義
+├── plugins/dev/          # Step 3.8 で導入する dev plugin の実体
 │   ├── agents/     # 役割別エージェント定義
 │   ├── commands/   # /コマンド 定義
 │   └── skills/     # 設計知識ライブラリ
@@ -306,6 +310,8 @@ npx playwright install chromium
 ├── CLAUDE.md       # Claude へのプロジェクト指示
 └── prompt.md       # よく使うコマンド一覧
 ```
+
+> `agents`・`commands`・`skills` は `plugins/dev/` 配下にある。以前は `.claude/` 直下に複製が置かれていたが、dev plugin への一本化により廃止された。
 
 ---
 
