@@ -7,21 +7,26 @@
 - ルール基準: [CLAUDE.md](CLAUDE.md)
 - スキル詳細: [plugins/dev/skills](plugins/dev/skills)
 
+> ここに載るコマンドは `plugins/dev/commands/` が正本です。コマンドを増減したらこの一覧も更新してください。
+
 ## Frequently Used
 
-- `/add-feature` Issue からブランチ・ステアリング生成→実装まで自動実行する
-- `/ship` PR作成→自動レビュー→修正ループ→マージまで一気通貫で実行する
-- `/setup-steering` 作業用の requirements / design / tasklist を作成する
-- `/review-docs` docs配下の品質レビューを行う
+- `/add-feature` 新機能を既存パターンに従って、完全に無停止で実装する
+- `/ship` push→レビュー→修正ループ→PR作成→マージをレビュー先行で一気通貫に実行する
+- `/setup-project` 初回セットアップ。PRD のみ対話式で作成し、残りの永続ドキュメントは承認後に自動生成する
+- `/setup-steering` 作業用の requirements / design / tasklist を作成する（`/add-feature` の計画部分だけを単体実行したいとき）
+- `/review-docs` docs 配下の品質レビューをサブエージェントで実行する
+
+## Design / Review
+
+- `/asdd` 大きいタスクを「計画→批判的検証→実装→検証」の4ステージで実行する（影響範囲が不明・複数ファイルに跨る変更）
+- `/design` designer→dev→doc の3分業パイプラインを、人間の承認ゲートを挟みながら順に起動する
+- `/smart-review` 差分を多観点で並列レビューし、セキュリティ問題を検出したら security-review を自動カスケードする
 
 ## Document Setup
 
-- `/setup-prd` PRDを作成する
-- `/setup-functional-design` 機能設計書を作成する
-- `/setup-architecture` 技術仕様書を作成する
-- `/setup-repository-structure` リポジトリ構造定義書を作成する
-- `/setup-development-guidelines` 開発ガイドラインを作成する
-- `/setup-glossary` 用語集を作成する
+永続ドキュメント（PRD・機能設計・アーキテクチャ・リポジトリ構造・開発ガイドライン・用語集）は
+`/setup-project` が対話式でまとめて生成します。各ドキュメントの書き方は下の Skill を参照してください。
 
 ## Skill Backlinks
 

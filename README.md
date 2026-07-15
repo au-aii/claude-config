@@ -2,7 +2,9 @@
 
 Claude Code の開発ワークフロー（SDD: PRD〜steering〜実装〜レビュー）を配布する **`dev` plugin** の公開マーケットプレイス。
 
-> **この repo は生成物です。** 正本は private リポジトリ `claude-dotfiles` の `plugins/` にあり、ここは publish パイプラインで **一方向に生成**された配布物です。直接編集しないでください（各ファイル先頭に自動生成ヘッダーがあります。編集は正本側で行い再生成します）。経緯は Issue #19 を参照。
+> **`plugins/dev/` 配下は生成物です。** その正本は private リポジトリ `claude-dotfiles` の `plugins/dev/` にあり、publish パイプラインで **一方向に生成**された配布物です（各ファイル先頭に自動生成ヘッダーがあります）。**`plugins/dev/` を直接編集しないでください**（編集は正本側で行い再生成します）。
+>
+> それ以外のファイル（この README・ONBOARDING・prompt.md・`docs/`・`scripts/`・Dev Container 設定・`.mcp.json` など）は**本 repo が正本**であり、直接編集してかまいません。経緯は Issue #19 を参照。
 
 ## 何が入っているか
 
@@ -10,7 +12,7 @@ Claude Code の開発ワークフロー（SDD: PRD〜steering〜実装〜レビ�
 
 - **エージェント** — Designer / Dev / Doc / Reviewer など局面別に呼び分け
 - **スキル** — 設計知識（アーキテクチャ設計・機能設計・PRD・用語集・リポジトリ構造・開発ガイドライン・steering）を分離して CLAUDE.md を肥大化させない
-- **コマンド** — `/asdd`・`/add-feature`・`/setup-project`・`/setup-steering`・`/ship`・`/smart-review`・`/review-docs`（一覧は [`prompt.md`](prompt.md)）
+- **コマンド** — `/add-feature`・`/asdd`・`/design`・`/setup-project`・`/setup-steering`・`/ship`・`/smart-review`・`/review-docs`（一覧は [`prompt.md`](prompt.md)）
 
 ## インストール
 
