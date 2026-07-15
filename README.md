@@ -12,7 +12,7 @@ Claude Code の開発ワークフロー（SDD: PRD〜steering〜実装〜レビ�
 
 - **エージェント** — Designer / Dev / Doc / Reviewer など局面別に呼び分け
 - **スキル** — 設計知識（アーキテクチャ設計・機能設計・PRD・用語集・リポジトリ構造・開発ガイドライン・steering）を分離して CLAUDE.md を肥大化させない
-- **コマンド** — `/add-feature`・`/asdd`・`/design`・`/setup-project`・`/setup-steering`・`/ship`・`/smart-review`・`/review-docs`（一覧は [`prompt.md`](prompt.md)）
+- **コマンド** — `/add-feature`・`/asdd`・`/design`・`/review-docs`・`/setup-project`・`/setup-steering`・`/ship`・`/smart-review`（一覧は [`prompt.md`](prompt.md)）
 
 ## インストール
 
