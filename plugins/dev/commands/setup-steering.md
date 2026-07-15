@@ -1,5 +1,6 @@
 ---
-description: 作業用の requirements / design / tasklist を作成する
+name: setup-steering
+description: "作業用の requirements / design / tasklist を作成する。/add-feature の計画部分（requirements / design / tasklist 作成）だけを単体で実行したい場合に使う。"
 ---
 
 <!-- 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。 -->

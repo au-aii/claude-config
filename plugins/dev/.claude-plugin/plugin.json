@@ -1,6 +1,6 @@
 {
   "name": "dev",
-  "description": "開発ワークフロー（SDD）: designer/dev/doc系agents + asdd, setup-project, ship, smart-review 等のcommands + 設計ドキュメントskills",
+  "description": "開発ワークフロー（SDD）: agents（designer-agent, dev-agent, doc-agent, doc-reviewer, implementation-validator, reviewer-agent） + commands（/add-feature, /asdd, /design, /review-docs, /setup-project, /setup-steering, /ship, /smart-review） + skills（architecture-design, development-guidelines, functional-design, glossary-creation, prd-writing, repository-structure, steering）",
   "version": "0.1.0",
   "author": {
     "name": "au-aii"

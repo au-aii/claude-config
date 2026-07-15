@@ -8,7 +8,7 @@ allowed-tools: Bash, Read, Glob, Grep, Agent
 
 # Ship（レビュー先行の出荷: push → レビュー → PR作成 → マージ）
 
-**重要:** レビューが clean になるまで PR を作成しない。`hooks/guard.sh` はレビュー証跡マーカーの無い `gh pr create` を物理ブロックする（このワークフローに従えば自然に通過する）。各ステップは完了後、ただちに次のステップへ移行すること。
+**重要:** レビューが clean（reviewer-agent が ✅ LGTM）になるまで PR を作成しない。**これはこのコマンド自身が守る規律であり、`hooks/guard.sh` の有無に依存しない。** config 経由で dev plugin だけを導入した環境（guard.sh は配布対象外）では、機械的な強制は無く、このコマンド定義に従ってレビューを先に完走させること自体がレビュー先行を支える（手順遵守に依存する運用規律）。dotfiles ネイティブ環境では加えて guard.sh が証跡マーカーの無い `gh pr create` を物理ブロックし、規律を機械的にも強制する（このワークフローに従えば自然に通過する）。各ステップは完了後、ただちに次のステップへ移行すること。
 
 **引数:** なし（オプション: PR タイトルと本文を省略した場合は自動生成）
 
@@ -58,15 +58,17 @@ allowed-tools: Bash, Read, Glob, Grep, Agent
 
 **3回修正してもまだ ❌ 要修正の場合:** 残っている指摘事項と修正できなかった理由をユーザーに報告し、手動対応を依頼して停止する。
 
-## ステップ4: レビュー証跡マーカーの作成
+## ステップ4: レビュー証跡マーカーの作成（dotfiles ネイティブ環境の物理強制層）
 
-レビューが clean（✅ LGTM）になった直後に作成する。これが無いと guard.sh が PR 作成をブロックする。
+レビューが clean（✅ LGTM）になった直後に作成する。`hooks/guard.sh` を導入した dotfiles ネイティブ環境では、これが無いと guard.sh が PR 作成をブロックする。
 
 ```bash
 marker_dir="$(git rev-parse --absolute-git-dir)/claude"
 mkdir -p "$marker_dir"
 printf 'branch=%s\nsha=%s\n' "$(git branch --show-current)" "$(git rev-parse HEAD)" > "$marker_dir/review-passed"
 ```
+
+**config 経由で dev plugin だけを導入した環境には guard.sh が無いため、このマーカーは作られても参照されない（実行しても無害）。その環境ではステップ3の ✅ LGTM ゲートが唯一の担保であり、レビューを飛ばして PR を作らないこと自体がこのコマンドの責務。**
 
 **禁止: レビューを完走せずにマーカーだけ作成すること（証跡の偽造）。** マーカーは branch と HEAD sha に束縛されるため、作成後にコミットを積むと無効になる（再レビューが必要）。
 
@@ -122,8 +124,8 @@ printf 'branch=%s\nsha=%s\n' "$(git branch --show-current)" "$(git rev-parse HEA
 
 - レビューで ✅ LGTM を取得している（PR 作成より**前**）
 - PR が作成されている
-- PR が main にマージされ、証跡マーカーが削除されている
-- 作業ブランチが削除されている
+- PR が main にマージされている
+- 作業ブランチが削除されている（ステップ6の後片付け＝証跡マーカー削除・main 復帰も完了）
 
 ## 中断条件（ユーザーに報告して停止）
 

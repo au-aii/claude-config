@@ -1,5 +1,6 @@
 ---
-description: "初回セットアップ: 6つの永続ドキュメントを対話的に作成する"
+name: setup-project
+description: "初回セットアップ: PRD のみ対話式で作成し、残り5つの永続ドキュメントは承認後に自動生成する"
 ---
 
 <!-- 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。 -->
