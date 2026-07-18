@@ -14,7 +14,7 @@
     {
       "name": "common",
       "source": "./plugins/common",
-      "description": "汎用ユーティリティ: commit / commit-push / critic / grill-me / task-start の commands + architect / code-reviewer / debugger / pm の agents"
+      "description": "汎用ユーティリティ: commit / commit-push / critic / grill-me / task-start の commands + architect / code-reviewer / debugger / project-manager の agents"
     }
   ]
 }

@@ -191,9 +191,9 @@ source ~/.bashrc
 
 ---
 
-## Step 3.8 — `dev` plugin を導入する（推奨）
+## Step 3.8 — `dev` / `common` plugin を導入する（推奨）
 
-エージェント・コマンド・スキルは `dev` plugin として配布している。Claude Code のチャットで導入する:
+エージェント・コマンド・スキルは `dev` plugin（SDD ワークフロー）と `common` plugin（汎用ユーティリティ）として配布している。Claude Code のチャットで導入する:
 
 ```
 /plugin marketplace add au-aii/claude-config
@@ -314,6 +314,7 @@ npx playwright install chromium
 │   ├── agents/     # 役割別エージェント定義
 │   ├── commands/   # /コマンド 定義
 │   └── skills/     # 設計知識ライブラリ
+├── plugins/common/       # 汎用ユーティリティ plugin（/commit・/grill-me 等）
 ├── .devcontainer/  # Dev Container 設定
 ├── .steering/      # 作業ごとの一時ドキュメント（YYYYMMDD-title/）
 ├── docs/           # プロジェクト永続ドキュメント

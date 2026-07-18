@@ -26,6 +26,7 @@ GitHub から直接追加する:
 
 ```
 /plugin install dev@claude-config-marketplace
+/plugin install common@claude-config-marketplace
 /reload-plugins
 ```
 
@@ -33,6 +34,7 @@ GitHub から直接追加する:
 
 ```
 claude plugin details dev@claude-config-marketplace
+claude plugin details common@claude-config-marketplace
 ```
 
 `dev` plugin の agents / commands / skills が表示されれば成功。
