@@ -198,13 +198,17 @@ source ~/.bashrc
 ```
 /plugin marketplace add au-aii/claude-config
 /plugin install dev@claude-config-marketplace
+/plugin install common@claude-config-marketplace
 ```
+
+> `common` は汎用ユーティリティ（/commit・/grill-me・/task-start 等）。dev の /goal が案内する /grill-me を使うために併せて導入を推奨。
 
 このリポジトリをクローン済みなら、リポジトリルートをパス指定しても導入できる:
 
 ```
 /plugin marketplace add /path/to/claude-config
 /plugin install dev@claude-config-marketplace
+/plugin install common@claude-config-marketplace
 ```
 
 以降 `/add-feature`・`/ship` などのコマンドが使えるようになる。
@@ -305,7 +309,7 @@ npx playwright install chromium
 ├── .claude/
 │   └── settings.json     # 権限・hooks・モデル設定
 ├── .claude-plugin/
-│   └── marketplace.json  # dev plugin のマーケットプレイス定義
+│   └── marketplace.json  # dev / common plugin のマーケットプレイス定義
 ├── plugins/dev/          # Step 3.8 で導入する dev plugin の実体
 │   ├── agents/     # 役割別エージェント定義
 │   ├── commands/   # /コマンド 定義

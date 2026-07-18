@@ -10,6 +10,11 @@
       "name": "dev",
       "source": "./plugins/dev",
       "description": "開発ワークフロー（SDD）: designer/dev/doc系agents + asdd, setup-project, ship, smart-review 等のcommands + 設計ドキュメントskills"
+    },
+    {
+      "name": "common",
+      "source": "./plugins/common",
+      "description": "汎用ユーティリティ: commit / commit-push / critic / grill-me / task-start の commands + architect / code-reviewer / debugger / pm の agents"
     }
   ]
 }

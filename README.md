@@ -21,6 +21,7 @@ Claude Code の Plugin 機構で導入する:
 ```
 /plugin marketplace add au-aii/claude-config
 /plugin install dev@claude-config-marketplace
+/plugin install common@claude-config-marketplace
 ```
 
 ローカルにクローン済みなら、リポジトリルートをパス指定しても追加できる:
@@ -28,6 +29,7 @@ Claude Code の Plugin 機構で導入する:
 ```
 /plugin marketplace add /path/to/claude-config
 /plugin install dev@claude-config-marketplace
+/plugin install common@claude-config-marketplace
 ```
 
 詳細手順は [`docs/plugin-getting-started.md`](docs/plugin-getting-started.md)、採用理由は [ADR-0001](docs/adr/0001-plugin-based-distribution.md) を参照。プロジェクトのテンプレートとして丸ごと使う手順は [ONBOARDING.md](ONBOARDING.md)。

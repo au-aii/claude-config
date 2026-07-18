@@ -1,0 +1,8 @@
+{
+  "name": "common",
+  "description": "汎用: agents（architect, code-reviewer, debugger, project-manager） + commands（/commit-push, /commit, /critic, /grill-me, /task-start）",
+  "version": "0.1.0",
+  "author": {
+    "name": "au-aii"
+  }
+}
