@@ -6,9 +6,10 @@ dev plugin が提供するコマンドとスキルの一覧です。運用ルー
 
 ## Commands
 
-- `/add-feature` 新機能を既存パターンに従って、完全に無停止で実装する
+- `/add-feature` 新機能を既存パターンに従って、完全に無停止で実装する。
 - `/asdd` Agent Spec Driven Development。
 - `/design` designer-agent → dev-agent → doc-agent の3分業パイプラインを、承認ゲートを挟みながら順に起動する司令塔コマンド。
+- `/goal` ゴールを自然文で受け、適切な SDD 入口へ振り分ける薄いルーター。
 - `/review-docs` ドキュメントの詳細レビューをサブエージェントで実行
 - `/setup-project` 初回セットアップ: PRD のみ対話式で作成し、残り5つの永続ドキュメントは承認後に自動生成する
 - `/setup-steering` 作業用の requirements / design / tasklist を作成する。
