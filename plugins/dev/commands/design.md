@@ -17,7 +17,7 @@ allowed-tools: Agent, Read, Bash, Glob, Grep
 
 - 生成物: `.steering/YYYYMMDD-[タイトル]/` 配下の `requirements.md` → `design.md` → `tasklist.md`（この順で作成される）
 - designer-agent はコードを一切書かず、3ファイル生成後に停止する契約
-- 注: designer-agent の tasklist.md は steering skill の `templates/tasklist.md` とは**別フォーマット**（互換ではない）。dev-agent は steering を経由せず tasklist を直接消化する契約のため機能上の問題はないが、/setup-steering 製の tasklist と混在させないこと
+- 注: designer-agent の生成物は steering skill の `templates/*.md` 準拠（/setup-steering 製と完全互換。旧・別フォーマット問題は #64 で解消済み）
 
 ## 承認ゲート（/add-feature との最大の違い）
 
