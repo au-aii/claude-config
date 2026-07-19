@@ -1,0 +1,642 @@
+<title>スキルの使い方 — dev plugin 仕様書</title>
+<style>
+  :root {
+    --paper: #f2f1ec;
+    --paper-raised: #ffffff;
+    --ink: #1f2420;
+    --ink-soft: #52584f;
+    --ink-faint: #83897f;
+    --line: rgba(31, 36, 32, 0.14);
+    --line-strong: rgba(31, 36, 32, 0.28);
+    --accent: #3c6e58;
+    --accent-soft: #dde7e0;
+    --accent-contrast: #f4f8f5;
+    --rust: #a8542e;
+    --rust-soft: #f1ded3;
+    --shadow: 0 1px 2px rgba(31, 36, 32, 0.06);
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #141815;
+    --paper-raised: #1b201c;
+    --ink: #e9ece7;
+    --ink-soft: #9aa39a;
+    --ink-faint: #6b726a;
+    --line: rgba(233, 236, 231, 0.14);
+    --line-strong: rgba(233, 236, 231, 0.26);
+    --accent: #74b393;
+    --accent-soft: rgba(116, 179, 147, 0.16);
+    --accent-contrast: #0d120f;
+    --rust: #e08a5f;
+    --rust-soft: rgba(224, 138, 95, 0.14);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #141815;
+      --paper-raised: #1b201c;
+      --ink: #e9ece7;
+      --ink-soft: #9aa39a;
+      --ink-faint: #6b726a;
+      --line: rgba(233, 236, 231, 0.14);
+      --line-strong: rgba(233, 236, 231, 0.26);
+      --accent: #74b393;
+      --accent-soft: rgba(116, 179, 147, 0.16);
+      --accent-contrast: #0d120f;
+      --rust: #e08a5f;
+      --rust-soft: rgba(224, 138, 95, 0.14);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Yu Gothic UI", "Hiragino Kaku Gothic ProN", "Zen Kaku Gothic New", "Noto Sans JP", sans-serif;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #bg-dots {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .mono {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, "Source Han Code JP", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  a { color: inherit; }
+
+  .shell {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 56px;
+    padding: 48px 32px 96px;
+  }
+
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; gap: 28px; padding: 28px 20px 64px; }
+    .rail { position: static !important; }
+  }
+
+  /* ---------- rail ---------- */
+  .rail {
+    position: sticky;
+    top: 32px;
+    align-self: start;
+  }
+
+  .rail-tag {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .rail-title {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 24px;
+  }
+
+  .rail nav {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .rail nav a {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 9px 2px;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    transition: color 0.15s ease;
+  }
+
+  .rail nav a:hover { color: var(--accent); }
+
+  .rail nav a .idx {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 16px;
+  }
+
+  .rail nav a.companion .idx { color: var(--rust); }
+
+  /* ---------- main ---------- */
+  header.intro {
+    margin-bottom: 40px;
+    max-width: 640px;
+  }
+
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    margin: 0 0 16px;
+    text-wrap: balance;
+  }
+
+  .lede {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .lede code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  /* explainer panel */
+  .panel {
+    background: var(--paper-raised);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 24px 26px;
+    margin-bottom: 44px;
+  }
+
+  .panel h2 {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 16px;
+    font-weight: 700;
+  }
+
+  .modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  @media (max-width: 560px) {
+    .modes { grid-template-columns: 1fr; }
+  }
+
+  .mode {
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+  }
+
+  .mode.manual { background: var(--rust-soft); }
+
+  .mode .mode-label {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .mode.manual .mode-label { color: var(--rust); }
+
+  .mode p { margin: 0; font-size: 13.5px; color: var(--ink); }
+
+  /* pipeline strip */
+  .pipeline {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 0 0 48px;
+    overflow-x: auto;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--paper-raised);
+    box-shadow: var(--shadow);
+  }
+
+  .pipe-step {
+    flex: 1 0 128px;
+    padding: 16px 14px;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+
+  .pipe-step:last-child { border-right: none; }
+
+  .pipe-step .num {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .pipe-step .name {
+    font-size: 13px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+    text-wrap: balance;
+  }
+
+  .pipe-step .out {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    display: block;
+  }
+
+  .pipe-step::after {
+    content: "→";
+    position: absolute;
+    right: -11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-faint);
+    font-size: 13px;
+    z-index: 1;
+  }
+
+  .pipe-step:last-child::after { content: none; }
+
+  /* skill cards */
+  .section-label {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 20px;
+    padding: 24px 4px;
+    border-top: 1px solid var(--line-strong);
+    scroll-margin-top: 28px;
+  }
+
+  .card:last-of-type { border-bottom: 1px solid var(--line-strong); }
+
+  @media (max-width: 560px) {
+    .card { grid-template-columns: 40px minmax(0, 1fr); gap: 14px; }
+  }
+
+  .card .idxnum {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+    padding-top: 2px;
+  }
+
+  .card.companion .idxnum { color: var(--rust); }
+
+  .card h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+    letter-spacing: -0.005em;
+  }
+
+  .card h3 .slug {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-weight: 400;
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin-left: 8px;
+  }
+
+  .card .desc {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    max-width: 60ch;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+    font-size: 12.5px;
+  }
+
+  .meta-row dt {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-right: 6px;
+  }
+
+  .meta-row .kv {
+    display: inline-flex;
+    align-items: baseline;
+    background: var(--accent-soft);
+    padding: 3px 9px 3px 4px;
+    border-radius: 5px;
+  }
+
+  .card.companion .meta-row .kv { background: var(--rust-soft); }
+
+  .meta-row .kv dd {
+    margin: 0;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    color: var(--ink);
+  }
+
+  .foot {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line-strong);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .foot code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card, .pipe-step { transition: background-color 0.2s ease; }
+  }
+</style>
+
+<canvas id="bg-dots"></canvas>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="rail-tag">Claude Code / dev plugin</div>
+    <div class="rail-title">スキル仕様書</div>
+    <nav>
+      <a href="#what"><span class="idx">00</span>スキルとは</a>
+      <a href="#prd-writing"><span class="idx">01</span>prd-writing</a>
+      <a href="#functional-design"><span class="idx">02</span>functional-design</a>
+      <a href="#architecture-design"><span class="idx">03</span>architecture-design</a>
+      <a href="#repository-structure"><span class="idx">04</span>repository-structure</a>
+      <a href="#development-guidelines"><span class="idx">05</span>development-guidelines</a>
+      <a href="#glossary-creation"><span class="idx">06</span>glossary-creation</a>
+      <a href="#steering" class="companion"><span class="idx">07</span>steering</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header class="intro" id="what">
+      <div class="eyebrow">How skills work</div>
+      <h1>スキルの使い方</h1>
+      <p class="lede">
+        スキルは Claude が特定の作業(PRD作成・設計書作成など)に入ったときだけ自動で読み込む、
+        <code>plugins/dev/skills/</code> 配下の詳細ガイドです。手動で起動する場面は基本的にありません。
+      </p>
+    </header>
+
+    <div class="panel">
+      <h2>起動のしくみ</h2>
+      <div class="modes">
+        <div class="mode">
+          <div class="mode-label">自動</div>
+          <p>各スキルの <code class="mono">description</code> と今の作業内容が一致すると、Claude が該当スキルを自動で読み込む。<code class="mono">/setup-project</code> や <code class="mono">/add-feature</code> の中で暗黙に呼ばれるのはこのパターン。</p>
+        </div>
+        <div class="mode manual">
+          <div class="mode-label">明示</div>
+          <p>「PRDスキルを使って」のように直接依頼すれば、そのタイミングで読み込ませることもできる。判断に迷ったら明示してよい。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">docs/ を作る6スキルの並び順</div>
+    <div class="pipeline">
+      <div class="pipe-step"><span class="num">01</span><span class="name">PRD</span><span class="out">product-requirements.md</span></div>
+      <div class="pipe-step"><span class="num">02</span><span class="name">機能設計</span><span class="out">functional-design.md</span></div>
+      <div class="pipe-step"><span class="num">03</span><span class="name">技術仕様</span><span class="out">architecture.md</span></div>
+      <div class="pipe-step"><span class="num">04</span><span class="name">構造定義</span><span class="out">repository-structure.md</span></div>
+      <div class="pipe-step"><span class="num">05</span><span class="name">開発規約</span><span class="out">development-guidelines.md</span></div>
+      <div class="pipe-step"><span class="num">06</span><span class="name">用語集</span><span class="out">glossary.md</span></div>
+    </div>
+
+    <div class="section-label">スキル一覧</div>
+
+    <article class="card" id="prd-writing">
+      <div class="idxnum">01</div>
+      <div>
+        <h3>PRD作成<span class="slug">prd-writing</span></h3>
+        <p class="desc">プロダクト要求定義書を作成するための詳細ガイドとテンプレート。ビジョン・ターゲット・成功指標などを対話的に固める。</p>
+        <dl class="meta-row">
+          <div class="kv"><dt>トリガー</dt><dd>PRD作成時のみ</dd></div>
+          <div class="kv"><dt>ツール</dt><dd>Read, Write</dd></div>
+          <div class="kv"><dt>出力</dt><dd>docs/product-requirements.md</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="card" id="functional-design">
+      <div class="idxnum">02</div>
+      <div>
+        <h3>機能設計書作成<span class="slug">functional-design</span></h3>
+        <p class="desc">アーキテクチャ・データモデル・画面遷移など、機能面の設計を書き起こすための詳細ガイド。</p>
+        <dl class="meta-row">
+          <div class="kv"><dt>トリガー</dt><dd>機能設計書作成時のみ</dd></div>
+          <div class="kv"><dt>ツール</dt><dd>Read, Write</dd></div>
+          <div class="kv"><dt>出力</dt><dd>docs/functional-design.md</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="card" id="architecture-design">
+      <div class="idxnum">03</div>
+      <div>
+        <h3>アーキテクチャ設計<span class="slug">architecture-design</span></h3>
+        <p class="desc">技術スタック・開発ツール・パフォーマンス要件など、技術仕様を定義するための詳細ガイド。</p>
+        <dl class="meta-row">
+          <div class="kv"><dt>トリガー</dt><dd>アーキテクチャ設計時のみ</dd></div>
+          <div class="kv"><dt>ツール</dt><dd>Read, Write</dd></div>
+          <div class="kv"><dt>出力</dt><dd>docs/architecture.md</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="card" id="repository-structure">
+      <div class="idxnum">04</div>
+      <div>
+        <h3>リポジトリ構造定義<span class="slug">repository-structure</span></h3>
+        <p class="desc">フォルダ構成・ファイル配置ルールを明確にし、保守しやすいリポジトリ構造を定義するための詳細ガイド。</p>
+        <dl class="meta-row">
+          <div class="kv"><dt>トリガー</dt><dd>リポジトリ構造定義時のみ</dd></div>
+          <div class="kv"><dt>ツール</dt><dd>Read, Write</dd></div>
+          <div class="kv"><dt>出力</dt><dd>docs/repository-structure.md</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="card" id="development-guidelines">
+      <div class="idxnum">05</div>
+      <div>
+        <h3>開発ガイドライン<span class="slug">development-guidelines</span></h3>
+        <p class="desc">コーディング規約と開発プロセスの標準化をカバーする、チーム開発向けの包括的なガイド。実装時にも参照される。</p>
+        <dl class="meta-row">
+          <div class="kv"><dt>トリガー</dt><dd>ガイドライン作成時 / コード実装時</dd></div>
+          <div class="kv"><dt>ツール</dt><dd>Read, Write, Edit</dd></div>
+          <div class="kv"><dt>出力</dt><dd>docs/development-guidelines.md</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <article class="card" id="glossary-creation">
+      <div class="idxnum">06</div>
+      <div>
+        <h3>用語集作成<span class="slug">glossary-creation</span></h3>
+        <p class="desc">プロジェクト固有の用語・ビジネス用語を体系的に定義し、英日対応表を整えるための詳細ガイド。</p>
+        <dl class="meta-row">
+          <div class="kv"><dt>トリガー</dt><dd>用語集作成時のみ</dd></div>
+          <div class="kv"><dt>ツール</dt><dd>Read, Write</dd></div>
+          <div class="kv"><dt>出力</dt><dd>docs/glossary.md</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <div class="section-label">docs/ を作り終えた後に併走するスキル</div>
+
+    <article class="card companion" id="steering">
+      <div class="idxnum">07</div>
+      <div>
+        <h3>ステアリング<span class="slug">steering</span></h3>
+        <p class="desc">6つの永続ドキュメントとは別枠。個々の作業指示ごとに requirements / design / tasklist を記録し、進捗管理する。<code class="mono">/add-feature</code> や <code class="mono">/setup-steering</code> から自動で読み込まれる。</p>
+        <dl class="meta-row">
+          <div class="kv"><dt>トリガー</dt><dd>作業計画時 / 実装時 / 検証時</dd></div>
+          <div class="kv"><dt>ツール</dt><dd>Read, Write, Edit</dd></div>
+          <div class="kv"><dt>出力</dt><dd>.steering/YYYYMMDD-&lt;title&gt;/*.md</dd></div>
+        </dl>
+      </div>
+    </article>
+
+    <div class="foot">
+      <span>スキル本体は <code>plugins/dev/skills/&lt;name&gt;/SKILL.md</code> に生成物として配置されている。</span>
+      <span>正本は <code>claude-dotfiles</code> — 直接編集せずそちらを更新して再生成する。</span>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var canvas = document.getElementById('bg-dots');
+  var ctx = canvas.getContext('2d');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var SPACING = 30;
+  var RADIUS = 1.1;
+  var SPEED = 0.00065;
+  var WAVELEN = 0.028;
+
+  var dpr = 1, w = 0, h = 0, cols = 0, rows = 0;
+
+  function isDark() {
+    var t = document.documentElement.getAttribute('data-theme');
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function dotRGB() {
+    return isDark() ? '116, 179, 147' : '60, 110, 88';
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.ceil(w / SPACING) + 1;
+    rows = Math.ceil(h / SPACING) + 1;
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, w, h);
+    var rgb = dotRGB();
+    for (var i = 0; i < cols; i++) {
+      for (var j = 0; j < rows; j++) {
+        var x = i * SPACING;
+        var y = j * SPACING;
+        var phase = (x + y) * WAVELEN - t * SPEED;
+        var wave = Math.sin(phase);
+        var alpha = 0.05 + 0.05 * (wave * 0.5 + 0.5);
+        var lift = wave * 1.6;
+        ctx.beginPath();
+        ctx.arc(x, y + lift, RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + rgb + ', ' + alpha.toFixed(3) + ')';
+        ctx.fill();
+      }
+    }
+  }
+
+  function loop(t) {
+    draw(t);
+    if (!reduceMotion) requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+
+  if (reduceMotion) {
+    draw(0);
+  } else {
+    requestAnimationFrame(loop);
+  }
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+    draw(reduceMotion ? 0 : performance.now());
+  });
+})();
+</script>
