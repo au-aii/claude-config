@@ -213,6 +213,8 @@ source ~/.bashrc
 
 以降 `/add-feature`・`/ship` などのコマンドが使えるようになる。
 
+> 導入したはずのコマンド（`/goal` 等）が見つからない場合は「よくあるトラブル」の [プラグインのコマンドが見つからない](#プラグインのコマンドが見つからない) を参照。
+
 ---
 
 ## Step 4 — プロジェクトの設計を固める（初回のみ）
@@ -299,6 +301,22 @@ npx playwright install chromium
 
 `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` が未設定。
 使わないなら `.mcp.json` の `context7` ブロックを削除して問題ない。
+
+### プラグインのコマンドが見つからない
+
+`/goal`・`/add-feature` 等が見当たらない場合、「マーケットプレイス登録」と「プラグイン有効化」のどちらが欠けているかを確認する（別レイヤーなので片方だけでは動かない）:
+
+```bash
+# マーケットプレイスが登録されているか
+cat ~/.claude/plugins/known_marketplaces.json | grep claude-config-marketplace
+
+# プラグインが有効化されているか
+cat ~/.claude/settings.json | grep -A3 enabledPlugins
+```
+
+`dev@claude-config-marketplace` / `common@claude-config-marketplace` が両方 `true` になっていなければ、Step 3.8 の手順を再実行する。
+
+過去に `dev`/`common` 分割前の旧構成（プラグイン名 `claude-config`）を導入していた場合、リネームは自動移行されず `~/.claude/plugins/cache/` に孤立キャッシュとして残ることがある。その場合は一度 `/plugin marketplace remove claude-config-marketplace` してから Step 3.8 を再実行する。
 
 ---
 
