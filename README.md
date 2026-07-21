@@ -39,6 +39,22 @@ Claude Code の Plugin 機構で導入する:
 
 詳細手順は [`docs/plugin-getting-started.md`](docs/plugin-getting-started.md)、採用理由は [ADR-0001](docs/adr/0001-plugin-based-distribution.md) を参照。プロジェクトのテンプレートとして丸ごと使う手順は [ONBOARDING.md](ONBOARDING.md)。
 
+### コマンドが見つからない・使えないとき
+
+「マーケットプレイス登録」と「プラグイン有効化」は別レイヤー。片方が欠けても症状は同じ（コマンドが見つからない）ため、両方を確認する:
+
+```bash
+# 1. マーケットプレイスが登録されているか
+cat ~/.claude/plugins/known_marketplaces.json | grep claude-config-marketplace
+
+# 2. プラグインが有効化されているか
+cat ~/.claude/settings.json | grep -A3 enabledPlugins
+```
+
+`dev@claude-config-marketplace` / `common@claude-config-marketplace` が両方 `true` になっていなければ、上記「インストール」の手順を再実行する。
+
+過去に `dev`/`common` 分割前の旧構成（プラグイン名 `claude-config`）を導入していた場合、リネームは自動移行されず `~/.claude/plugins/cache/` に孤立キャッシュとして残ることがある。その場合は一度 `/plugin marketplace remove claude-config-marketplace` してから「インストール」の手順を再実行する。
+
 ## 開発フロー
 
 1. `docs/ideas/` にアイデアをメモ
