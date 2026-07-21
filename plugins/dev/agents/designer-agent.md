@@ -2,7 +2,7 @@
 name: designer-agent
 model: sonnet
 description: 新機能の設計ドキュメントを作成する専門エージェント。requirements.md → design.md → tasklist.md を生成して停止する。実装は行わない。
-tools: Read, Write, Edit, Bash, Glob, Grep
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 
 <!-- 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。 -->
