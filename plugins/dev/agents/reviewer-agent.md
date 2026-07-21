@@ -2,7 +2,7 @@
 name: reviewer-agent
 model: sonnet
 description: ブランチ差分または PR のコードレビューとセキュリティレビューを実行する専門エージェント。PR モードのときのみ結果を GitHub PR コメントに1回だけ投稿する
-tools: Bash, Read, Glob, Grep
+tools: [Bash, Read, Glob, Grep]
 ---
 
 <!-- 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。 -->

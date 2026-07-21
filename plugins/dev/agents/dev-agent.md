@@ -2,7 +2,7 @@
 name: dev-agent
 model: sonnet
 description: 設計ドキュメント（tasklist.md）に基づいて実装を行う専門エージェント。docs/ の更新は行わない。
-tools: Read, Write, Edit, Bash, Glob, Grep
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 
 <!-- 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。 -->

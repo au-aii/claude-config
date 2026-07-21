@@ -2,7 +2,7 @@
 name: doc-agent
 model: sonnet
 description: 実装完了後に docs/ 配下の永続ドキュメントを更新する専門エージェント。コードは変更しない。
-tools: Read, Write, Edit, Bash, Glob, Grep
+tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 
 <!-- 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。 -->
