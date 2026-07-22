@@ -2,9 +2,19 @@
 
 Claude Code の開発ワークフロー（SDD: PRD〜steering〜実装〜レビュー）を配布する **`dev` plugin** と、汎用ユーティリティの **`common` plugin** の公開マーケットプレイス。
 
-> **`plugins/` 配下は生成物です。** その正本は private リポジトリ `claude-dotfiles` の `plugins/` にあり、publish パイプラインで **一方向に生成**された配布物です（各ファイル先頭に自動生成ヘッダーがあります）。**`plugins/` を直接編集しないでください**（編集は正本側で行い再生成します）。
+> **`plugins/` と `core/` 配下は生成物です。** その正本は private リポジトリ `claude-dotfiles` の `plugins/`・`core/` にあり、publish パイプラインで **一方向に生成**された配布物です（各ファイル先頭に自動生成ヘッダーがあります）。**`plugins/`・`core/` を直接編集しないでください**（編集は正本側で行い再生成します）。
 >
 > それ以外のファイル（この README・ONBOARDING・prompt.md・`docs/`・`scripts/`・Dev Container 設定・`.mcp.json` など）は**本 repo が正本**であり、直接編集してかまいません。経緯は Issue #19 を参照。
+
+## core/principles.md（行動原則）
+
+`core/principles.md` は、ツール非依存の行動原則の正本（[claude-dotfiles/core/principles.md](https://github.com/au-aii/claude-dotfiles/blob/main/core/principles.md)）から生成された配布物。plugin ではないため `/plugin install` の対象外——導入する場合は clone したこのリポジトリを参照する形で、自分の `CLAUDE.md` に以下のように import する:
+
+```markdown
+@core/principles.md
+```
+
+（相対パスはこのリポジトリを clone したディレクトリ基準。詳細は `core/principles.md` 冒頭のコメントを参照）
 
 ## 何が入っているか
 
