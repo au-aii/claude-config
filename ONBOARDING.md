@@ -217,6 +217,55 @@ source ~/.bashrc
 
 ---
 
+## Step 3.9 — 安全ネット（guard hooks + credential の Read 拒否）を入れる（強く推奨）
+
+plugin とは**別枠**の導入が要る。理由は Claude Code の仕様で、**plugin 側の設定には `permissions`（allow/deny）を置けない**ため。加えて deny はセキュリティガードなので、plugin を無効化したら効かなくなる場所に置くべきでもない。そのため「ファイルを配って `settings.json` にマージしてもらう」形にしている。
+
+入るものは2つ:
+
+| 何が                   | 効果                                                                                                                                                            |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`permissions.deny`** | `.env` / `secrets/` / `.aws/` / `.ssh/` / `.config/gcloud/` の**読み取りを拒否**する。プロンプトインジェクション等で認証情報を読み出される経路を塞ぐ            |
+| **guard hooks**        | `main` への直接 commit/push、`rm -rf /` 等、`git clean` の実削除（＝ git で復元できない）を**実行前に止める**。`settings.json` 自体の AI による書き換えも止める |
+
+### 手順
+
+1. **このリポジトリを clone する**（plugin だけを入れている場合は clone していないことがある）
+
+   ```bash
+   git clone https://github.com/au-aii/claude-config.git ~/claude-config
+   ```
+
+2. **`hooks/settings-recommended.json` を開く**。`permissions.deny` と `hooks` の2つのキーが入っている
+
+3. **`permissions.deny` と `hooks` の2つだけを**自分の `settings.json` にマージする（macOS/Linux/Windows とも `~/.claude/settings.json`）
+
+   > ⚠️ **ファイルを丸ごとコピーしないこと。** 先頭の `$comment` は説明用の非標準キーで、**Claude Code がこれを無視するかは未検証**。設定全体が不正扱いされると guard が丸ごと効かなくなるため、必要な2キーだけを抜き出す。
+   >
+   > ⚠️ **キーを丸ごと上書きしないこと。** 既に `permissions` や `hooks` がある場合は、**配列に追記**する形でマージする。上書きすると既存の hook や許可設定が消える。
+
+4. **`__CLAUDE_CONFIG_DIR__` を clone した絶対パスに置換する**（例: `/Users/you/claude-config`）。3箇所ある
+
+5. **Claude Code を再起動**して反映する
+
+### 効いているか確認する
+
+適当なリポジトリの `main` ブランチで、Claude に「main に直接コミットして」と頼む。次のように**止まれば成功**:
+
+```
+❌ main/master への直接 commit/push は禁止。ブランチを切ってください
+```
+
+止まらない場合は `settings.json` の JSON が壊れている可能性が高い（構文エラーだと hooks が丸ごとロードされない）。`python3 -c "import json;json.load(open('settings.json'))"` で確認する。
+
+### 既知の限界（過信しないための注意）
+
+- **Claude Code の Bash ツール経由でしか効かない。** 他のエージェント（Cursor 等）や人間が直接叩くコマンドは素通りする
+- **コマンド文字列の判定なので、難読化（base64 等）は貫通する**。「最後の砦」ではなく「よくある事故を止める」層として使う
+- 詳細な設計と限界は正本リポジトリの `hooks/guard.sh` のヘッダーコメントに書いてある
+
+---
+
 ## Step 4 — プロジェクトの設計を固める（初回のみ）
 
 Claude Code のチャットで以下を実行する：
@@ -333,6 +382,8 @@ cat ~/.claude/settings.json | grep -A3 enabledPlugins
 │   ├── commands/   # /コマンド 定義
 │   └── skills/     # 設計知識ライブラリ
 ├── plugins/common/       # 汎用ユーティリティ plugin（/commit・/grill-me 等）
+├── core/principles.md    # 行動原則（ツール非依存の正本からの生成物）
+├── hooks/          # Step 3.9 で入れる安全ネット（guard 一式 + 推奨 settings）
 ├── .devcontainer/  # Dev Container 設定
 ├── .steering/      # 作業ごとの一時ドキュメント（YYYYMMDD-title/）
 ├── docs/           # プロジェクト永続ドキュメント
