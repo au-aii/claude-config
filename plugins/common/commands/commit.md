@@ -1,6 +1,6 @@
 ---
 name: commit
-description: 現在の変更をコミットする。git status/diff を確認しCLAUDE.md の規約に従ってコミットメッセージを作成する。"コミットして" などの指示で自動トリガー。
+description: 現在の変更をコミットする。git status/diff を確認しCLAUDE.md の規約に従ってコミットメッセージを作成する。
 allowed-tools: Bash
 ---
 

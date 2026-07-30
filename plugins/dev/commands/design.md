@@ -1,6 +1,6 @@
 ---
 name: design
-description: designer-agent → dev-agent → doc-agent の3分業パイプラインを、承認ゲートを挟みながら順に起動する司令塔コマンド。使う場面：設計ドキュメントを人間の承認ゲートを挟みながら作りたい機能開発。使わない場面：無停止で一気に実装したい場合（/add-feature）・批判的検証つきで回したい場合（/asdd）・計画ファイルだけ欲しい場合（/setup-steering）。"設計から進めて" "designer-agentを使って" "SDDで作って" などで自動トリガー。
+description: designer-agent → dev-agent → doc-agent の3分業パイプラインを、承認ゲートを挟みながら順に起動する司令塔コマンド。使う場面：設計ドキュメントを人間の承認ゲートを挟みながら作りたい機能開発。使わない場面：無停止で一気に実装したい場合（/add-feature）・批判的検証つきで回したい場合（/asdd）・計画ファイルだけ欲しい場合（/setup-steering）。
 argument-hint: "<機能の説明>"
 allowed-tools: Agent, Read, Bash, Glob, Grep
 ---
@@ -26,6 +26,7 @@ designer-agent の完了報告（3ファイルのパスと要点3行）をその
 - **ユーザーの明示的な承認を得るまでステージ2に進まない**
 - 修正依頼が来たら designer-agent を再起動して該当ファイルを直させ、再度提示する
 - 承認語（「OK」「進めて」「承認」等）が得られて初めて次へ
+- この承認は「実装していいか」のゲート。PR のマージは別のゴーサインが要る（ADR-0020）
 
 ## ステージ 2 — 実装（dev-agent）
 

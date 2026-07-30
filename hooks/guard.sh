@@ -224,10 +224,14 @@ fi
 
 # 3) 危険な rm -rf（ルート / ホーム / ワイルドカード / カレント直）のみ。
 #    rm -rf ./path や node_modules、深いパス（~/foo, $HOME/foo）は通す。
-if printf '%s' "$cmd" | grep -Eq '(^|[^[:alnum:]_])rm[[:space:]]+(-[[:alnum:]]*[rR][[:alnum:]]*[fF]|-[[:alnum:]]*[fF][[:alnum:]]*[rR]|-[rR][[:space:]]+-[fF]|-[fF][[:space:]]+-[rR])'; then
+#    cmd ではなく cmd_scan（allowlist 済みフラグ直後の cat ヒアドキュメント本文を除去済み）から
+#    判定する。3b(git clean) と揃え、`--body`/`-m` の本文に説明として "rm -rf ~/..." と書いた
+#    だけの PR/Issue 本文・コミットメッセージを実コマンドと誤読して block する穴を塞ぐ（Issue #99。
+#    #61 で 3b・レビューゲート等を cmd_scan に向けたときの取りこぼし）。
+if printf '%s' "$cmd_scan" | grep -Eq '(^|[^[:alnum:]_])rm[[:space:]]+(-[[:alnum:]]*[rR][[:alnum:]]*[fF]|-[[:alnum:]]*[fF][[:alnum:]]*[rR]|-[rR][[:space:]]+-[fF]|-[fF][[:space:]]+-[rR])'; then
   # ホーム系: ~ / $HOME / ${HOME}（単体または末尾スラッシュ）。深いパスは除外。
-  if printf '%s' "$cmd" | grep -Eq "[[:space:]\"']+(~|\\\$HOME|\\\$\\{HOME\\})/?([[:space:]\"';&|]|\$)" \
-     || printf '%s' "$cmd" | grep -Eq "[[:space:]\"']+(/|\\*|/\\*|\\.|\\./)([[:space:]\"';&|]|\$)"; then
+  if printf '%s' "$cmd_scan" | grep -Eq "[[:space:]\"']+(~|\\\$HOME|\\\$\\{HOME\\})/?([[:space:]\"';&|]|\$)" \
+     || printf '%s' "$cmd_scan" | grep -Eq "[[:space:]\"']+(/|\\*|/\\*|\\.|\\./)([[:space:]\"';&|]|\$)"; then
     block "危険な rm -rf（ルート/ホーム/ワイルドカード対象）を検出。範囲を限定するか、人間に確認してください。"
   fi
 fi

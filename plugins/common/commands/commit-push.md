@@ -1,6 +1,6 @@
 ---
 name: commit-push
-description: 現在のブランチにコミットしてリモートへプッシュする。main/master への直接プッシュは禁止。"プッシュして" などの指示で自動トリガー。
+description: 現在のブランチにコミットしてリモートへプッシュする。main/master への直接プッシュは禁止。
 allowed-tools: Bash
 ---
 
