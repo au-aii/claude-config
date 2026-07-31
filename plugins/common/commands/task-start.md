@@ -1,6 +1,6 @@
 ---
 name: task-start
-description: 作業開始のワンコマンド。Issue 作成(または既存 Issue 指定)→ Issue 連動ブランチ作成 → worktree 分離 → ベースライン記録を一括実行する。「作業を始めたい」「タスク開始」などの指示で自動トリガー。
+description: 作業開始のワンコマンド。Issue 作成(または既存 Issue 指定)→ Issue 連動ブランチ作成 → worktree 分離 → ベースライン記録を一括実行する。
 allowed-tools: Bash
 ---
 

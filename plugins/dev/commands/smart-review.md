@@ -1,8 +1,8 @@
 ---
 name: smart-review
-description: 拡張コードレビュー。PR差分・ローカル差分を多観点で並列レビューし、セキュリティ問題が検出された場合は自動で security-review をカスケード実行する。使う場面：セキュリティ懸念を含みうる差分・多観点の並列レビューが必要な大きめの PR。使わない場面：通常の差分レビュー（/code-review で十分）・セキュリティ専用レビュー（/security-review 単体）。"スマートレビュー" "smart-review" などで自動トリガー。
+description: 拡張コードレビュー。PR差分・ローカル差分を多観点で並列レビューし、セキュリティ問題が検出された場合は自動でセキュリティ詳細審査をカスケード実行する。使う場面：セキュリティ懸念を含みうる差分・多観点の並列レビューが必要な大きめの PR。使わない場面：通常の差分レビュー（/code-review で十分）。
 argument-hint: "[pr-number]"
-allowed-tools: Agent, Bash(gh pr diff:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr comment:*), Bash(gh issue view:*), Bash(gh search:*), Bash(git diff:*), Bash(git log:*), Bash(git blame:*), Bash(git show:*), Read, Grep, Glob, Skill
+allowed-tools: Agent, Bash(gh pr diff:*), Bash(gh pr view:*), Bash(gh pr list:*), Bash(gh pr comment:*), Bash(gh issue view:*), Bash(gh search:*), Bash(git diff:*), Bash(git log:*), Bash(git blame:*), Bash(git show:*), Read, Grep, Glob
 ---
 
 <!-- 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。 -->
@@ -45,6 +45,8 @@ PR または git diff から変更内容のサマリを生成する。
 
 ## Step 4: 並列レビュー
 
+**この観点表は `/ship` のステップ2からも参照される単一の正本である。** 観点を足す・減らす・意味を変えるときは、ship 側の前提（Agent D を起動しない・対象差分は `origin/main...HEAD`）も併せて確認すること。
+
 以下の9つの Sonnet agent（上記テンプレート適用）を**同時に**起動する。各 agent は issue のリストと、各 issue に対する0〜100の信頼度スコアの根拠を返す。
 
 **標準観点:**
@@ -74,15 +76,20 @@ PR または git diff から変更内容のサマリを生成する。
 
 **80点未満の issue はすべて除外する。**
 
-## Step 6: セキュリティカスケード判定
+## Step 6: セキュリティ詳細審査カスケード判定
 
-Step 5 終了後、**Agent E（セキュリティ）の issue が1件以上残っている**（80点以上）場合:
+Step 5 終了後、**Agent E（セキュリティ）の issue が1件以上残っている**（80点以上）場合、詳細審査を1体追加で起動する:
 
 ```
-「セキュリティ問題が検出されました。詳細審査のため security-review を実行します。」
+「セキュリティ問題が検出されました。詳細審査を実行します。」
 ```
 
-と通知してから `Skill(security-review)` を実行する。
+と通知してから、**「エージェント起動テンプレート」に従って general-purpose の Sonnet agent を1体**起動する（外部 skill には依存しない＝既存の並列機構を再利用）。プロンプトには次を含める:
+
+1. 対象差分の取得コマンド（Step 4 と同じ）
+2. Agent E が 80 点以上で検出したセキュリティ issue のリスト（ファイル:行・根拠つき）
+3. 担当: それらの issue の深掘り審査 — 各 issue の悪用可能性（攻撃シナリオ・前提条件）、実際に成立するかの再現手順、影響範囲、最小修正案を返す。**成立しない誤検知は明示的に棄却する**（Agent E の指摘を検証する adversarial パス）
+4. 出力形式: issue ごとに「悪用可能性 / 再現手順 / 影響 / 修正案 / 確度(0〜100)」
 
 Agent E の残存 issue が0件の場合はカスケードしない。
 
@@ -91,7 +98,7 @@ Agent E の残存 issue が0件の場合はカスケードしない。
 **PRモード:**
 
 - `gh pr comment` で以下の形式で投稿する（1回のみ）
-- セキュリティカスケードがあった場合はその結果も含める
+- セキュリティ詳細審査カスケードがあった場合はその結果も含める
 
 **ローカルモード:**
 
@@ -109,7 +116,7 @@ N件の問題を検出しました。
 信頼度: XX%
 
 ---
-（セキュリティカスケードが走った場合、security-review の結果をここに続ける）
+（セキュリティ詳細審査が走った場合、その結果をここに続ける）
 ```
 
 問題が0件の場合は「問題は検出されませんでした。」とだけ出力する。
@@ -124,5 +131,5 @@ N件の問題を検出しました。
 
 - Step 7 の統合レポートが出力されている
 - PR モードの場合は `gh pr comment` によるコメント投稿が1回だけ行われている
-- Step 6 で security-review カスケードが発火した場合、その結果が Step 7 のレポートに含まれている
+- Step 6 でセキュリティ詳細審査カスケードが発火した場合、その結果が Step 7 のレポートに含まれている
 - 80点未満の issue がレポートに含まれていない

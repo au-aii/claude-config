@@ -1,6 +1,6 @@
 ---
 name: goal
-description: ゴールを自然文で受け、適切な SDD 入口へ振り分ける薄いルーター。使う場面：ゴールはあるがどの入口（add-feature / asdd / design / setup-steering / setup-project）か迷うとき・覚える入口を1個にしたいとき。使わない場面：宛先が最初から分かっているとき（直接呼ぶ方が速い）。承認ゲート既定・無停止は --auto 指定時のみ。"ゴールから始めて" "goalで" などで自動トリガー。
+description: ゴールを自然文で受け、適切な SDD 入口へ振り分ける薄いルーター。使う場面：ゴールはあるがどの入口（add-feature / asdd / design / setup-steering / setup-project）か迷うとき・覚える入口を1個にしたいとき。使わない場面：宛先が最初から分かっているとき（直接呼ぶ方が速い）。承認ゲート既定・無停止は --auto 指定時のみ。
 allowed-tools: Read, Glob, Bash, Agent
 ---
 
@@ -44,7 +44,12 @@ allowed-tools: Read, Glob, Bash, Agent
 
 ## ステップ5 — 出口の案内
 
-委譲先の作業が完了したら、共通の出口として `/ship`（push→レビュー→PR→マージ）を案内する。
+委譲先の作業が完了したら、共通の出口を案内する:
+
+- **既定**: `/commit-push` → fresh subagent でレビューを完走 → README「レビュー証跡ゲート」の手順でマーカーを作成 → `gh pr create` で PR を作成し**そこで停止**する（マーカー無しの `gh pr create` は `hooks/guard.sh` が物理ブロックする。マージは別途ユーザーのゴーサインを待つ）
+- **マージまで任せたい場合**: `/ship`（push→レビュー→PR→**マージ**まで一気通貫のフルオート）
+
+この使い分けは `/goal` 自身のゲート（ステップ3・実装着手前）とは別物。ステップ3のゲートは「実装していいか」、マージのゴーサインは「main に入れていいか」で役割が違う（ADR-0020）。
 
 ## 完了条件
 
