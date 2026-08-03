@@ -1,20 +1,25 @@
 {
   "name": "claude-config-marketplace",
-  "description": "PRD〜steering〜実装〜レビューの開発ワークフロー一式を配布するマーケットプレイス",
+  "description": "AI コーディングエージェントの破壊的操作を止めるガードレールを配布するマーケットプレイス",
   "owner": {
     "name": "au-aii",
     "url": "https://github.com/au-aii/claude-config"
   },
   "plugins": [
     {
-      "name": "dev",
-      "source": "./plugins/dev",
-      "description": "開発ワークフロー（SDD）: designer/dev/doc系agents + asdd, setup-project, ship, smart-review 等のcommands + 設計ドキュメントskills"
-    },
-    {
       "name": "common",
       "source": "./plugins/common",
-      "description": "汎用ユーティリティ: commit / commit-push / critic / grill-me / task-start の commands + architect / code-reviewer / debugger / project-manager の agents"
+      "description": "汎用: agents（architect, code-reviewer, debugger, project-manager） + commands（/commit-push, /commit, /critic, /grill-me, /task-start）"
+    },
+    {
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "開発ワークフロー（SDD）: agents（designer-agent, dev-agent, doc-agent, doc-reviewer, implementation-validator） + commands（/add-feature, /asdd, /design, /goal, /review-docs, /setup-project, /setup-steering, /ship, /smart-review） + skills（architecture-design, development-guidelines, functional-design, glossary-creation, prd-writing, repository-structure, steering）"
+    },
+    {
+      "name": "guardrails",
+      "source": "./plugins/guardrails",
+      "description": "AI エージェントに破壊的な git 操作をさせないガードレール一式。main への直接 commit/push・ルート/ホームを対象にした rm -rf・git clean の実削除・並行セッションのブランチ取り違え・settings.json の自己改変を PreToolUse で止める。テスト135件。"
     }
   ]
 }
