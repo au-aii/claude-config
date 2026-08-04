@@ -94,6 +94,8 @@ branch="${BRANCH_OVERRIDE:-$(git -C "$eff_cwd" rev-parse --abbrev-ref HEAD 2>/de
 
 block() {
   # 計測(#82): 発火を追記ログに残し、後で #56(D の要否)/#61(誤検知) をデータで判断できるようにする。
+  # src には発火した guard.sh 自身のパス($0)を入れる。install.sh の配線と配布 plugin の
+  # hooks.json が同時に有効なマシンでは、どちらが止めたかログからしか区別できないため(#196)。
   # block の挙動(stderr → exit 2)は不変。ログ処理の失敗は握りつぶす（計測が安全機構の動作を左右しない＝
   # フェイルセーフ）。jq は block() 到達時点で必ず存在する（冒頭で不在ならフェイルオープン済）。
   local logfile="${CLAUDE_GUARD_LOG:-$HOME/.claude/state/guard-block.log}"
@@ -101,8 +103,8 @@ block() {
     mkdir -p "$(dirname "$logfile")" 2>/dev/null &&
       jq -cn --arg ts "$(date +%Y-%m-%dT%H:%M:%S%z)" \
         --arg branch "$branch" --arg cwd "$eff_cwd" \
-        --arg reason "$1" --arg cmd "$cmd" \
-        '{ts:$ts,branch:$branch,cwd:$cwd,reason:$reason,cmd:$cmd}' >>"$logfile"
+        --arg reason "$1" --arg cmd "$cmd" --arg src "$0" \
+        '{ts:$ts,branch:$branch,cwd:$cwd,reason:$reason,cmd:$cmd,src:$src}' >>"$logfile"
   } 2>/dev/null || true
   printf '%s\n' "❌ $1" >&2
   exit 2
