@@ -43,6 +43,18 @@ AI エージェント（Claude Code など）に**取り返しのつかない操
 @core/principles.md
 ```
 
+## ワークフロー系は配っていません
+
+SDD（仕様駆動開発）のワークフロー、コードレビュー、commit・PR 作成は、**既に良いものが公開されている**のでここでは配っていません。探している場合はこちらへ。
+
+| 欲しいもの                       | どこにあるか                                                                                                                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 計画 → 実装 → 検証の skill 一式  | `superpowers`（Anthropic 公式マーケットプレイス収録）<br>`/plugin marketplace add anthropics/claude-plugins-official`<br>`/plugin install superpowers@claude-plugins-official` |
+| 仕様駆動開発のツールキット       | [github/spec-kit](https://github.com/github/spec-kit)（125k★。30+ の AI コーディングエージェントに対応。Claude Code 対応は明記されていないので要確認）                         |
+| コードレビュー / commit・PR 作成 | Anthropic 公式マーケットプレイスの `code-review` / `commit-commands`                                                                                                           |
+
+ここが配るのは、**公式マーケットプレイス273件を全部見て、出来合いのものが見つからなかったガードレールだけ**です。
+
 ## このリポジトリについて
 
 `core/`・`hooks/`・`plugins/` は private リポジトリ `claude-dotfiles` から**一方向に生成された配布物**です（各ファイル先頭に自動生成ヘッダーがあります）。**直接編集しても次回の生成で上書きされます。** 修正は Issue でお知らせください。
