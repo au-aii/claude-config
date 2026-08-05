@@ -50,7 +50,7 @@ SDD（仕様駆動開発）のワークフロー、コードレビュー、commi
 | 欲しいもの                       | どこにあるか                                                                                                                                                                   |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 計画 → 実装 → 検証の skill 一式  | `superpowers`（Anthropic 公式マーケットプレイス収録）<br>`/plugin marketplace add anthropics/claude-plugins-official`<br>`/plugin install superpowers@claude-plugins-official` |
-| 仕様駆動開発のツールキット       | [github/spec-kit](https://github.com/github/spec-kit)（125k★。30+ の AI コーディングエージェントに対応。Claude Code 対応は明記されていないので要確認）                         |
+| 仕様駆動開発のツールキット       | [github/spec-kit](https://github.com/github/spec-kit)（125k★・GitHub 公式）。Claude Code 対応（skills モードで `.claude/skills` に配置）。Python 3.11+ と uv が要り、**プロジェクトごと**に `specify init` する                         |
 | コードレビュー / commit・PR 作成 | Anthropic 公式マーケットプレイスの `code-review` / `commit-commands`                                                                                                           |
 
 ここが配るのは、**公式マーケットプレイス273件を全部見て、出来合いのものが見つからなかったガードレールだけ**です。
