@@ -88,6 +88,37 @@ if [ -n "$extracted" ] && ! printf '%s' "${cmd#*&&}" | grep -Eq '(^|&&|;|\|)[[:s
     cd_target="$extracted"
   fi
 fi
+# `git -C <dir>` は「その git 呼び出しだけ別 repo を対象にする」ので、`cd <dir> &&` と同じく
+# ブランチ判定の基準にする（#205）。これが無いまま has_git_subcmd を -C 対応にすると、
+# 別 repo への操作を「今いる repo のブランチ」で判定して誤 block する——それが
+# 「ヘルパー側を直せない」とされていた理由だった。ここで解消する。
+#   - `-C` が git 呼び出しに属するものだけを拾う（`make -C dir` 等を巻き込まない）
+#   - 対象が複数（別々の repo）なら採用しない＝hook_cwd で判定する。曖昧なときは block 側に倒す
+#     （guard.sh 全体の方針。誤 block は書き直せるが、通した操作は戻らない）
+#   - 実在する git repo でなければ採用しない（cd と同じ）
+if [ -z "$cd_target" ]; then
+  # cmd_scan はこの時点でまだ未定義（定義は後段）。cd 抽出と同じく $cmd の1行目だけを見る——
+  # ヒアドキュメント本文に現れる `git -C <path>`（PR 本文の手順説明など）を拾って
+  # 無関係な repo をブランチ判定の基準にしてしまうのを防ぐため（Issue #61 と同じ理由）。
+  git_c_target=$(printf '%s' "$cmd" | head -1 |
+    grep -oE "(^|[^[:alnum:]_])git(([[:space:]]+-[^[:space:]]+)([[:space:]]+[^-][^[:space:]]*)?)*[[:space:]]+-C[[:space:]]+('[^']+'|\"[^\"]+\"|[^[:space:];&|]+)" |
+    sed -E "s/.*-C[[:space:]]+//" | sort -u)
+  if [ -n "$git_c_target" ] && [ "$(printf '%s\n' "$git_c_target" | wc -l | tr -d ' ')" = "1" ]; then
+    git_c_target=${git_c_target#\'}; git_c_target=${git_c_target%\'}
+    git_c_target=${git_c_target#\"}; git_c_target=${git_c_target%\"}
+    case "$git_c_target" in
+      "~")   git_c_target="$HOME" ;;
+      "~/"*) git_c_target="$HOME/${git_c_target#\~/}" ;;
+    esac
+    case "$git_c_target" in
+      /*) ;;
+      *)  git_c_target="$hook_cwd/$git_c_target" ;;
+    esac
+    if git -C "$git_c_target" rev-parse --git-dir >/dev/null 2>&1; then
+      cd_target="$git_c_target"
+    fi
+  fi
+fi
 eff_cwd="${cd_target:-$hook_cwd}"
 
 branch="${BRANCH_OVERRIDE:-$(git -C "$eff_cwd" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")}"
@@ -163,9 +194,15 @@ cmd_scan=$(printf '%s\n' "$cmd" | awk '
 ')
 
 has_git_subcmd() {
-  # git とサブコマンドの間にオプション（-q 等）が挟まっても拾う。
+  # git とサブコマンドの間にオプションが挟まっても拾う。
+  # **値を取るオプション**（`-c KEY=VAL` / `-C DIR` / `--git-dir DIR`）にも対応する: 値は `-` で
+  # 始まらないので、旧実装（`(-[^[:space:]]+)*` のみ）はそこでパターンが途切れ、
+  # `git -c a=b commit` を main ブランチで素通りさせていた（#205・実測で commit が成功）。
+  # `--no-pager` のような値を取らないものは旧実装でも拾えていた。
+  # 値の候補は「`-` で始まらない1トークン」に限る（サブコマンド自身を値と誤読しても、
+  # 直後にサブコマンドが無ければマッチしないだけで安全側に落ちる）。
   # cmd ではなく cmd_scan（ヒアドキュメント本文除去済み）を走査する。
-  printf '%s' "$cmd_scan" | grep -Eq "(^|[^[:alnum:]_])git([[:space:]]+-[^[:space:]]+)*[[:space:]]+$1([[:space:];&|]|\$)"
+  printf '%s' "$cmd_scan" | grep -Eq "(^|[^[:alnum:]_])git(([[:space:]]+-[^[:space:]]+)([[:space:]]+[^-][^[:space:]]*)?)*[[:space:]]+$1([[:space:];&|]|\$)"
 }
 
 # 1x) commit/push の危険判定ヘルパー。`git push <remote> --delete <branch>`（または `-d`、
@@ -180,7 +217,8 @@ has_git_subcmd() {
 has_dangerous_commit_or_push() {
   has_git_subcmd 'commit' && return 0
   has_git_subcmd 'push' || return 1
-  push_segs=$(printf '%s' "$cmd_scan" | grep -oE '(^|[^[:alnum:]_])git([[:space:]]+-[^[:space:]]+)*[[:space:]]+push[^;&|]*')
+  # 値を取る global option（`-c KEY=VAL` 等）を挟んだ形も拾う（#205・has_git_subcmd と同じ理由）
+  push_segs=$(printf '%s' "$cmd_scan" | grep -oE '(^|[^[:alnum:]_])git(([[:space:]]+-[^[:space:]]+)([[:space:]]+[^-][^[:space:]]*)?)*[[:space:]]+push[^;&|]*')
   dangerous=0
   while IFS= read -r seg; do
     [ -z "$seg" ] && continue
@@ -209,7 +247,7 @@ fi
 #     tail を `[[:space:]]*(&&|;|\||$)` にして「main/master の直後がコマンド区切り」に限定
 #     している。`git checkout main -- <file>`（main からのファイル復元。HEAD は動かない）を
 #     「main へ切替」と誤認していた分を除外する（Issue #61）。
-if printf '%s' "$cmd_scan" | grep -Eq 'git[[:space:]]+(checkout|switch)([[:space:]]+-[^[:space:]]+)*[[:space:]]+(main|master)[[:space:]]*(&&|;|\||$)' \
+if printf '%s' "$cmd_scan" | grep -Eq 'git(([[:space:]]+-[^[:space:]]+)([[:space:]]+[^-][^[:space:]]*)?)*[[:space:]]+(checkout|switch)([[:space:]]+-[^[:space:]]+)*[[:space:]]+(main|master)[[:space:]]*(&&|;|\||$)' \
    && has_dangerous_commit_or_push; then
   block "main/master へ切り替えてから commit/push する連鎖を検出。ブランチを分けてください。"
 fi
@@ -252,6 +290,11 @@ fi
 #     波及し、あちらは eff_cwd のブランチで判定するため「別 repo を -C で操作」した時に誤 block する
 #     （ヘッダーの既知の限界を参照）。clean は repo・ブランチに関係なく一律 block なのでこの副作用が
 #     無く、ここだけ引数つき global option を許容する検知にする。
+#     ⚠️ 訂正（2026-08-06・#205）: 上記の懸念は解消した。has_git_subcmd を引数つき global option
+#     対応にし、同時に `git -C <dir>` を cd_target に採用してブランチを正しい repo で判定するように
+#     したため、「別 repo を -C で操作した時の誤 block」は起きない。**放置していた間、main での
+#     `git -c a=b commit` が実際に素通りしていた**（実測）。この clean 側の独自検知はそのまま残す
+#     （一律 block で正しく動いており、触る理由が無い＝原則10）。
 #     dry-run 判定は $cmd 全体ではなく「マッチした clean 呼び出し区間」に対して行う。$cmd 全体に対し
 #     grep すると `git log -n 5 && git clean -fdx` のような、無関係な -n 系トークンを含む複合コマンド
 #     で dry-run と誤判定し実削除がすり抜ける（「まず履歴を見てから片付ける」という自然な言い回しで
