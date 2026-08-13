@@ -9,7 +9,7 @@
     {
       "name": "guardrails",
       "source": "./plugins/guardrails",
-      "description": "AI エージェントに破壊的な git 操作をさせないガードレール一式。main への直接 commit/push・ルート/ホームを対象にした rm -rf・git clean の実削除・並行セッションのブランチ取り違え・settings.json の自己改変を PreToolUse で止める。セルフテスト104件。"
+      "description": "AI エージェントに破壊的な git 操作をさせないガードレール一式。main への直接 commit/push・ルート/ホームを対象にした rm -rf・git clean の実削除・並行セッションのブランチ取り違え・settings.json の自己改変を PreToolUse で止める。セルフテスト113件。"
     }
   ]
 }

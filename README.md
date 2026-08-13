@@ -33,7 +33,7 @@ AI エージェント（Claude Code など）に**取り返しのつかない操
 
 ## テスト
 
-配布する3つの hook には、正本リポジトリでセルフテストが **104件**付いています（`guard` 84 / `guard-edit` 13 / `guard-configchange` 7）。テスト本体は非公開ですが、挙動に疑問があれば Issue で聞いてください。
+配布する3つの hook には、正本リポジトリでセルフテストが **113件**付いています（`guard` 93 / `guard-edit` 13 / `guard-configchange` 7）。テスト本体は非公開ですが、挙動に疑問があれば Issue で聞いてください。
 
 ## `core/principles.md`
 
