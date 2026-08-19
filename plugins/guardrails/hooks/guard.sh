@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。
+# 自動生成: 非公開の正本から生成された配布物です。直接編集しても次回の生成で上書きされます。修正は Issue でお知らせください。
 # Claude Code PreToolUse guard (Bash matcher)
 #
 # 「致命的＝戻せない / 外部を汚す」操作だけを block する二次防御。
@@ -339,7 +339,18 @@ if [ -n "$session_id" ] && has_git_subcmd '(commit|checkout|switch)'; then
   if [ -n "$repo" ] && [ -n "$cur" ]; then
     lock_dir="$HOME/.claude/state/branch-guard"
     mkdir -p "$lock_dir" 2>/dev/null
-    key=$(printf '%s' "${session_id}:${repo}" | shasum 2>/dev/null | awk '{print $1}')
+    # shasum は macOS には常在するが Linux では保証がない（Perl 由来）。無いと key が空になり
+    # lock_file がディレクトリ自身を指し、読み書きが全て失敗してブランチロックが**無言で**無効に
+    # なる。jq 不在時は警告を出しているのにここだけ黙っていた。sha1sum へフォールバックし、
+    # どちらも無ければ警告する（フェイルオープンのままだが、無効であることは必ず可視化する）。
+    key=""
+    if command -v shasum >/dev/null 2>&1; then
+      key=$(printf '%s' "${session_id}:${repo}" | shasum | awk '{print $1}')
+    elif command -v sha1sum >/dev/null 2>&1; then
+      key=$(printf '%s' "${session_id}:${repo}" | sha1sum | awk '{print $1}')
+    else
+      printf '%s\n' "⚠️  guard.sh: shasum/sha1sum が見つかりません。ブランチロックが無効です。" >&2
+    fi
     lock_file="${lock_dir}/${key}"
 
     # 意図的なブランチ移動はロックを解除（次の commit で移動先を受け入れる）。

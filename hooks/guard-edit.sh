@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。
+# 自動生成: 非公開の正本から生成された配布物です。直接編集しても次回の生成で上書きされます。修正は Issue でお知らせください。
 # Claude Code PreToolUse guard(Edit|Write matcher)
 #
 # settings.json / settings.local.json への Edit/Write ツール経由の書き込みを block する。
@@ -69,7 +69,7 @@ for pf in "${protected_files[@]}"; do
     [ "$file_path" = "$pf" ] && matched=1
   fi
   if [ "$matched" = 1 ]; then
-    printf '%s\n' "❌ settings.json/settings.local.json への Edit/Write は禁止。sandbox/permissions/hooks の自己改変を防ぐため、変更は人間が直接エディタで行ってください。(issue #70 フェーズ3b)" >&2
+    printf '%s\n' "❌ settings.json/settings.local.json への Edit/Write は禁止。sandbox/permissions/hooks の自己改変を防ぐため、変更は人間が直接エディタで行ってください。" >&2
     exit 2
   fi
 done
