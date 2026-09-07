@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 自動生成: このファイルは claude-dotfiles から生成された配布物です。直接編集せず、正本(https://github.com/au-aii/claude-dotfiles)を編集して再生成してください。
+# 自動生成: 非公開の正本から生成された配布物です。直接編集しても次回の生成で上書きされます。修正は Issue でお知らせください。
 # Claude Code ConfigChange hook — 設定ファイル変更の監査ログ。
 #
 # settings.json 等の変更を検知して記録する「事後検知」の保険。ブロックはしない。

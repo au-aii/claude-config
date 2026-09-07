@@ -16,6 +16,12 @@ AI エージェント（Claude Code など）に**取り返しのつかない操
 
 `rm -rf ./node_modules` のような日常的な操作は通します。止めるのは復旧できないものだけです。
 
+### main ブランチで直接作業したい場合
+
+このガードは main / master への直接 commit・push を止めます。**個人プロジェクトで main に直接コミットする運用なら、最初の commit で止められます。** その場合は `hooks/guard.sh` の「1) main/master への直接 commit / push」ブロックを削除してください。他のガード（ワイルドカード削除・追跡外ファイルの実削除・ブランチ取り違え・`settings.json` の自己改変）はそのまま残ります。
+
+環境変数によるオプトアウトは**意図的に用意していません**。AI 自身が変数を付けて実行すれば外せてしまい、それでは安全機構として成立しないためです。外すなら、外したことがコードに残る形にしてください。
+
 ## 導入
 
 ### Plugin として入れる（推奨）
@@ -31,27 +37,30 @@ AI エージェント（Claude Code など）に**取り返しのつかない操
 
 `hooks/` を任意の場所に置き、`hooks/settings-recommended.json` の内容を自分の `settings.json` にマージします。この JSON には hook の配線に加えて、認証情報・環境変数ファイルの読み取りを拒否する `permissions.deny` も入っています。
 
+## 記録されるもの
+
+`guard.sh` は block したとき、`$HOME/.claude/state/guard-block.log` に1行 JSON を追記します（誤検知率を後から集計するため）。
+
+- 記録されるのは **block されたコマンドの全文**・時刻・ブランチ・作業ディレクトリ・理由
+- 通過した操作は記録しません
+- ローテーションはしません（増え続けます）
+- 保存先の変更は `CLAUDE_GUARD_LOG=/path/to/log`、**無効化は `CLAUDE_GUARD_LOG=/dev/null`**
+
+block されたコマンドにトークンや社内のパスが含まれていれば、それも平文で残ります。共有マシンで使う場合は保存先を確認してください。
+
 ## テスト
 
 配布する3つの hook には、正本リポジトリでセルフテストが **113件**付いています（`guard` 93 / `guard-edit` 13 / `guard-configchange` 7）。テスト本体は非公開ですが、挙動に疑問があれば Issue で聞いてください。
-
-## `core/principles.md`
-
-ツール非依存の行動原則。plugin ではないので `/plugin install` の対象外です。使う場合は clone して自分の `CLAUDE.md` から import します：
-
-```markdown
-@core/principles.md
-```
 
 ## ワークフロー系は配っていません
 
 SDD（仕様駆動開発）のワークフロー、コードレビュー、commit・PR 作成は、**既に良いものが公開されている**のでここでは配っていません。探している場合はこちらへ。
 
-| 欲しいもの                       | どこにあるか                                                                                                                                                                   |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 計画 → 実装 → 検証の skill 一式  | `superpowers`（Anthropic 公式マーケットプレイス収録）<br>`/plugin marketplace add anthropics/claude-plugins-official`<br>`/plugin install superpowers@claude-plugins-official` |
-| 仕様駆動開発のツールキット       | [github/spec-kit](https://github.com/github/spec-kit)（125k★・GitHub 公式）。Claude Code 対応（skills モードで `.claude/skills` に配置）。Python 3.11+ と uv が要り、**プロジェクトごと**に `specify init` する                         |
-| コードレビュー / commit・PR 作成 | Anthropic 公式マーケットプレイスの `code-review` / `commit-commands`                                                                                                           |
+| 欲しいもの                       | どこにあるか                                                                                                                                                                                                    |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 計画 → 実装 → 検証の skill 一式  | `superpowers`（Anthropic 公式マーケットプレイス収録）<br>`/plugin marketplace add anthropics/claude-plugins-official`<br>`/plugin install superpowers@claude-plugins-official`                                  |
+| 仕様駆動開発のツールキット       | [github/spec-kit](https://github.com/github/spec-kit)（125k★・GitHub 公式）。Claude Code 対応（skills モードで `.claude/skills` に配置）。Python 3.11+ と uv が要り、**プロジェクトごと**に `specify init` する |
+| コードレビュー / commit・PR 作成 | Anthropic 公式マーケットプレイスの `code-review` / `commit-commands`                                                                                                                                            |
 
 ここが配るのは、**公式マーケットプレイス273件を全部見て、出来合いのものが見つからなかったガードレールだけ**です。
 
