@@ -1,7 +1,7 @@
 {
   "name": "guardrails",
-  "description": "AI エージェントに破壊的な git 操作をさせないガードレール一式。main への直接 commit/push・ルート/ホームを対象にした rm -rf・git clean の実削除・並行セッションのブランチ取り違え・settings.json の自己改変を PreToolUse で止める。セルフテスト113件。",
-  "version": "0.1.0",
+  "description": "AI エージェントの危険な削除とサンドボックス無効化を防ぐガードレール。ルートやホームを対象にした rm -rf と git clean の実削除を PreToolUse で止め、設定変更を監査する。",
+  "version": "0.2.0",
   "author": {
     "name": "au-aii"
   }
