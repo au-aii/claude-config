@@ -16,15 +16,6 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash|PowerShell",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"__CLAUDE_CONFIG_DIR__/hooks/guard.sh\""
-          }
-        ]
-      },
-      {
         "matcher": "Edit|Write",
         "hooks": [
           {
